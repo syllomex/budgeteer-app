@@ -1,0 +1,6 @@
+{
+  "semi": false,
+  "singleQuote": true,
+  "prettier.eslintIntegration": true,
+  "arrowParens": "avoid"
+}
