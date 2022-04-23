@@ -3,8 +3,10 @@
     "name": "budgeteer-app",
     "slug": "budgeteer-app",
     "version": "1.0.0",
-    "assetBundlePatterns": [
-      "**/*"
-    ]
+    "assetBundlePatterns": ["**/*"],
+    "android": {
+      "googleServicesFile": "./android/app/google-services.json"
+    },
+    "plugins": ["@react-native-google-signin/google-signin"]
   }
 }
