@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "budgeteer-app",
+    "slug": "budgeteer-app",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
