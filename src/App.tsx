@@ -1,41 +1,58 @@
 import { StatusBar } from 'expo-status-bar'
 import React from 'react'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
-import { Button, Text, View } from 'react-native'
-import { AuthProvider, useAuth } from './contexts/auth'
+import { View } from 'react-native'
+import { NavigationContainer } from '@react-navigation/native'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
+import {
+  useFonts,
+  JosefinSans_400Regular,
+  JosefinSans_500Medium,
+  JosefinSans_600SemiBold,
+  JosefinSans_700Bold
+} from '@expo-google-fonts/josefin-sans'
+import AppLoading from 'expo-app-loading'
+import { AuthProvider } from './contexts/auth'
+import { RootStack } from './routes/RootStack'
+import { Toast } from './components/Toast'
+import { StoreProvider } from './contexts/store'
 
 GoogleSignin.configure({
   webClientId: process.env.GOOGLE_WEB_CLIENT_ID
 })
 
 const AppComponent = () => {
-  const { signIn, signOut, user } = useAuth()
-
   return (
-    <View style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}>
-      {!user
-        ? (
-        <>
-          <Text>Hello! Sign in now!</Text>
-          <Button onPress={signIn} title="SignIn" />
-        </>
-          )
-        : (
-        <>
-          <Text>Welcome, {user.displayName}</Text>
-          <Button onPress={signOut} title="SignOut" />
-        </>
-          )}
-
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaProvider>
+      <View style={{ flex: 1 }}>
+        <RootStack />
+        <Toast />
+        <StatusBar style="auto" />
+      </View>
+    </SafeAreaProvider>
   )
 }
 
 export default function App () {
+  const [fontsLoaded] = useFonts({
+    regular: JosefinSans_400Regular,
+    medium: JosefinSans_500Medium,
+    semiBold: JosefinSans_600SemiBold,
+    bold: JosefinSans_700Bold
+  })
+
+  if (!fontsLoaded) return <AppLoading />
+
   return (
-    <AuthProvider>
-      <AppComponent />
-    </AuthProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <NavigationContainer>
+        <AuthProvider>
+          <StoreProvider>
+            <AppComponent />
+          </StoreProvider>
+        </AuthProvider>
+      </NavigationContainer>
+    </GestureHandlerRootView>
   )
 }

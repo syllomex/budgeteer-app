@@ -1,6 +1,6 @@
 import React, {
   createContext,
-  FunctionComponent,
+  PropsWithChildren,
   useCallback,
   useContext,
   useEffect,
@@ -9,14 +9,21 @@ import React, {
 import auth from '@react-native-firebase/auth'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import { ActivityIndicator, Modal, View } from 'react-native'
+import firestore from '@react-native-firebase/firestore'
 
 import { SetState } from '../utils/types'
+import { colors } from '../config/styles'
 
 type GoogleUser = {
   displayName: string
   uid: string
   email: string
   photoURL: string
+}
+
+type CurrentUser = {
+  name: string
+  photo?: string
 }
 
 type User = GoogleUser
@@ -28,18 +35,30 @@ interface AuthContext {
   setInitializing: SetState<boolean>
   loading: boolean
   setLoading: SetState<boolean>
+  currentUser?: CurrentUser
+  setCurrentUser: SetState<CurrentUser | undefined>
 }
 
 const Auth = createContext({} as AuthContext)
 
-export const AuthProvider: FunctionComponent = ({ children }) => {
+export const AuthProvider: PropsWithChildren<any> = ({ children }) => {
   const [user, setUser] = useState<User | null>()
   const [loading, setLoading] = useState(false)
   const [initializing, setInitializing] = useState(true)
+  const [currentUser, setCurrentUser] = useState<CurrentUser | undefined>()
 
   const onAuthStateChanged = useCallback(
     user => {
-      setUser(user)
+      if (user) {
+        setUser({
+          displayName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          uid: user.uid
+        })
+      } else {
+        setUser(undefined)
+      }
       if (initializing) setInitializing(false)
     },
     [initializing]
@@ -50,6 +69,22 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     return subscriber
   }, [onAuthStateChanged])
 
+  useEffect(() => {
+    ;(async () => {
+      try {
+        const _currentUser = await GoogleSignin.getCurrentUser()
+        setCurrentUser(_currentUser.user)
+      } catch (err) {
+        setCurrentUser(undefined)
+      }
+    })()
+  }, [user])
+
+  useEffect(() => {
+    if (!user) return
+    firestore().collection('users').doc(user.uid).set(user, { merge: true })
+  }, [user])
+
   return (
     <Auth.Provider
       value={{
@@ -58,7 +93,9 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
         initializing,
         setInitializing,
         loading,
-        setLoading
+        setLoading,
+        currentUser,
+        setCurrentUser
       }}
     >
       <Modal visible={loading || initializing} animationType="fade" transparent>
@@ -70,7 +107,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
             backgroundColor: 'rgba(255, 255, 255, 0.7)'
           }}
         >
-          <ActivityIndicator size="large" color="blue" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </Modal>
       {children}
@@ -79,10 +116,11 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
 }
 
 export const useAuth = () => {
-  const { user, setLoading } = useContext(Auth)
+  const { user, setLoading, currentUser, setCurrentUser } = useContext(Auth)
 
   const signIn = useCallback(async () => {
     setLoading(true)
+
     try {
       const { idToken } = await GoogleSignin.signIn()
       const googleCredential = auth.GoogleAuthProvider.credential(idToken)
@@ -94,6 +132,18 @@ export const useAuth = () => {
     }
   }, [setLoading])
 
+  const revokeAndSignIn = useCallback(async () => {
+    try {
+      setLoading(true)
+      setCurrentUser(undefined)
+      await GoogleSignin.revokeAccess()
+    } catch (err) {
+      //
+    }
+
+    await signIn()
+  }, [setCurrentUser, setLoading, signIn])
+
   const signOut = useCallback(() => {
     auth().signOut()
   }, [])
@@ -101,6 +151,8 @@ export const useAuth = () => {
   return {
     signIn,
     signOut,
-    user
+    user,
+    currentUser,
+    revokeAndSignIn
   }
 }

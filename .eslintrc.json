@@ -21,7 +21,8 @@
     "@typescript-eslint/no-unused-vars": "warn",
     "import/no-cycle": "warn",
     "import/first": "warn",
-    "import/order": "warn"
+    "import/order": "warn",
+    "camelcase": "off"
   },
   "settings": {
     "react": {
