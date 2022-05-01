@@ -4,10 +4,11 @@ import { colors, rem } from '../../config/styles'
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.primary,
-    borderRadius: rem(1.6),
+    borderRadius: rem(3),
     alignItems: 'center',
     justifyContent: 'center',
-    padding: rem(1.6)
+    padding: rem(1.6),
+    paddingVertical: rem(1.2)
   },
   text: {
     color: colors['text-in-primary'],

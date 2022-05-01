@@ -8,7 +8,7 @@ import { T } from '../../components/T'
 import { colors, rem } from '../../config/styles'
 import { useDashboard } from '../../hooks'
 import { MonthSelector } from '../../components/MonthSelector'
-import { Category } from './category'
+import { Category, NewCategoryButton } from './category'
 import styles from './styles'
 
 export const Dashboard = () => {
@@ -40,6 +40,11 @@ export const Dashboard = () => {
               {categories.map(category => (
                 <Category key={category.uid} data={category} />
               ))}
+
+              <NewCategoryButton
+                center={!categories.length}
+                textColor={!categories.length ? 'primary' : 'muted'}
+              />
             </View>
               )}
         </View>

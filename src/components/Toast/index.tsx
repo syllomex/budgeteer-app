@@ -8,7 +8,7 @@ const toastConfig: ToastConfig = {
       {...params}
       style={{ borderLeftColor: colors.primary }}
       text1Style={{
-        fontSize: 16,
+        fontSize: 14,
         fontFamily: 'medium',
         color: colors['text-neutral']
       }}

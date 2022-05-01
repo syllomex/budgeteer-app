@@ -14,7 +14,8 @@ const styles = StyleSheet.create({
   },
   noDataContainer: {
     alignItems: 'center',
-    paddingTop: rem(5.6)
+    paddingTop: rem(5.6),
+    paddingBottom: rem(0.8)
   }
 })
 

@@ -47,6 +47,7 @@ export const useDashboard = () => {
       .collection('months')
       .doc(monthId)
       .collection('categories')
+      .orderBy('name')
       .onSnapshot(async snapshot => {
         const arr = []
 

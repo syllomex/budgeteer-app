@@ -110,6 +110,7 @@ export const AuthProvider: PropsWithChildren<any> = ({ children }) => {
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </Modal>
+
       {children}
     </Auth.Provider>
   )
