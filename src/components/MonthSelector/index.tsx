@@ -14,7 +14,7 @@ const arrowProps = {
 }
 
 export const MonthSelector: React.FunctionComponent = () => {
-  const { month, goToPrevMonth, goToNextMonth } = useDashboard()
+  const { month, goToPrevMonth, goToNextMonth, total } = useDashboard()
 
   return (
     <View style={styles.monthSelectorContainer}>
@@ -26,7 +26,7 @@ export const MonthSelector: React.FunctionComponent = () => {
           <T f="semiBold" s={1.6}>
             {displayYearMonth(month)}
           </T>
-          <T c="muted">Gastos: {monetize(5630.7)}</T>
+          {total !== undefined && <T c="muted">Gastos: {monetize(total)}</T>}
         </View>
         <TouchableOpacity style={styles.arrowContainer} onPress={goToNextMonth}>
           <MaterialIcons name="arrow-forward" {...arrowProps} />
