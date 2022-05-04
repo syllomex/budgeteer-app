@@ -1,7 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React from 'react'
 import { useAuth } from '../contexts/auth'
-import { CategoryForm } from '../screens/CategoryForm'
 import { ExpenditureForm } from '../screens/ExpenditureForm'
 import { AnonymousStack } from './AnonymousStack'
 import { AuthenticatedDrawer } from './AuthenticatedDrawer'
@@ -21,11 +20,6 @@ export const RootStack = () => {
           name="AuthenticatedDrawer"
           component={AuthenticatedDrawer}
           options={{ headerShown: false }}
-        />
-        <Screen
-          name="CategoryForm"
-          component={CategoryForm}
-          options={{ title: 'Categoria' }}
         />
         <Screen
           name="ExpenditureForm"
