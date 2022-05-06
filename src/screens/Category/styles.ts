@@ -7,10 +7,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors['background-light']
   },
   contentContainer: {
-    padding: rem(2)
-  },
-  categoriesContainer: {
-    paddingVertical: rem(2.4)
+    paddingHorizontal: rem(2),
+    paddingTop: rem(3)
   }
 })
 

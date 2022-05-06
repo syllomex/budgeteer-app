@@ -2,6 +2,8 @@ export const rem = (value: number) => {
   return value * 10
 }
 
+export type Color = keyof typeof colors
+
 export const colors = {
   primary: '#66AAEE',
   'primary-1': '#CCDDEE',

@@ -10,7 +10,8 @@ import {
   JosefinSans_400Regular,
   JosefinSans_500Medium,
   JosefinSans_600SemiBold,
-  JosefinSans_700Bold
+  JosefinSans_700Bold,
+  JosefinSans_400Regular_Italic
 } from '@expo-google-fonts/josefin-sans'
 import AppLoading from 'expo-app-loading'
 import { AuthProvider } from './contexts/auth'
@@ -39,7 +40,8 @@ export default function App () {
     regular: JosefinSans_400Regular,
     medium: JosefinSans_500Medium,
     semiBold: JosefinSans_600SemiBold,
-    bold: JosefinSans_700Bold
+    bold: JosefinSans_700Bold,
+    italic: JosefinSans_400Regular_Italic
   })
 
   if (!fontsLoaded) return <AppLoading />

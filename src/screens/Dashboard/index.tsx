@@ -1,13 +1,10 @@
 import React from 'react'
-import { ActivityIndicator, Image, ScrollView, View } from 'react-native'
+import { ActivityIndicator, ScrollView, View } from 'react-native'
 
-import noData from '../../assets/images/no-data.png'
-
-import { T } from '../../components/T'
-
-import { colors, rem } from '../../config/styles'
+import { colors } from '../../config/styles'
 import { useDashboard } from '../../hooks'
 import { MonthSelector } from '../../components/MonthSelector'
+import { NoContent } from '../../components/NoContent'
 import { Category, NewCategoryButton } from './category'
 import styles from './styles'
 
@@ -26,17 +23,10 @@ export const Dashboard = () => {
               )
             : (
             <View>
-              {!categories.length && (
-                <View style={styles.noDataContainer}>
-                  <Image source={noData} />
-                  <T
-                    style={{ textAlign: 'center', paddingTop: rem(1.6) }}
-                    c="muted"
-                  >
-                    Nada cadastrado nesse mês
-                  </T>
-                </View>
-              )}
+              <NoContent visible={categories.length === 0}>
+                Nada cadastrado nesse mês
+              </NoContent>
+
               {categories.map(category => (
                 <Category key={category.uid} data={category} />
               ))}

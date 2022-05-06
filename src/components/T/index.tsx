@@ -3,7 +3,7 @@ import { Text, TextProps } from 'react-native'
 
 import { colors, rem } from '../../config/styles'
 
-type FontFamily = 'regular' | 'medium' | 'semiBold' | 'bold'
+type FontFamily = 'regular' | 'medium' | 'semiBold' | 'bold' | 'italic'
 type Color = keyof typeof colors
 type Size = number
 
