@@ -1,18 +1,23 @@
-import React, { useCallback, useState } from 'react'
+import React, { forwardRef, useImperativeHandle, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { View } from 'react-native'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 
 import { format } from 'date-fns'
+import { Modalize } from 'react-native-modalize'
 import { Button } from '../Button'
 import { ControlledInput } from '../Form/Input'
 import { Spacer } from '../Spacer'
 import styles from './styles'
+import { useCreateExpenditure } from './useCreateExpenditure'
 
 interface ExpenditureFormProps {
   categoryId?: string
-  onSubmit: (data: any) => Promise<void>
+}
+
+export interface ExpenditureFormHandles {
+  open(): void
 }
 
 const schema = yup.object().shape({
@@ -21,50 +26,59 @@ const schema = yup.object().shape({
   date: yup.string().required()
 })
 
-export const ExpenditureForm: React.FunctionComponent<ExpenditureFormProps> = ({
-  onSubmit,
-  categoryId
-}) => {
+const ExpenditureFormComponent: React.ForwardRefRenderFunction<
+  ExpenditureFormHandles,
+  ExpenditureFormProps
+> = ({ categoryId }, ref) => {
+  const modalRef = useRef<Modalize>(null)
+
   const { control, handleSubmit } = useForm({ resolver: yupResolver(schema) })
 
-  const [loading, setLoading] = useState(false)
+  const { onSubmit, loading } = useCreateExpenditure({
+    categoryId,
+    onSuccess: () => modalRef.current?.close()
+  })
 
-  const submit = useCallback(
-    async formData => {
-      try {
-        setLoading(true)
-        await onSubmit({ ...formData, categoryId })
-      } finally {
-        setLoading(false)
-      }
-    },
-    [categoryId, onSubmit]
-  )
+  useImperativeHandle(ref, () => ({ open: () => modalRef.current?.open() }))
 
   return (
-    <View style={styles.container}>
-      <ControlledInput control={control} name="description" label="Descrição" />
-      <Spacer height={1.8} />
+    <Modalize
+      ref={modalRef}
+      adjustToContentHeight
+      scrollViewProps={{ keyboardShouldPersistTaps: 'always' }}
+      withReactModal
+    >
+      <View style={styles.container}>
+        <ControlledInput
+          control={control}
+          name="description"
+          label="Descrição"
+          autoFocus
+        />
+        <Spacer height={1.8} />
 
-      <ControlledInput
-        control={control}
-        name="value"
-        label="Valor"
-        keyboardType="decimal-pad"
-      />
-      <Spacer height={1.8} />
+        <ControlledInput
+          control={control}
+          name="value"
+          label="Valor"
+          keyboardType="decimal-pad"
+        />
+        <Spacer height={1.8} />
 
-      <ControlledInput
-        control={control}
-        name="date"
-        label="Data"
-        defaultValue={format(new Date(), 'yyyy-MM-dd')}
-      />
+        <ControlledInput
+          control={control}
+          name="date"
+          label="Data"
+          defaultValue={format(new Date(), 'yyyy-MM-dd')}
+        />
 
-      <Spacer height={3} />
-      <Button loading={loading} onPress={handleSubmit(submit)}>
-        Salvar
-      </Button>
-    </View>
+        <Spacer height={3} />
+        <Button loading={loading} onPress={handleSubmit(onSubmit)}>
+          Salvar
+        </Button>
+      </View>
+    </Modalize>
   )
 }
+
+export const ExpenditureForm = forwardRef(ExpenditureFormComponent)
