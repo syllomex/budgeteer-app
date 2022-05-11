@@ -31,19 +31,28 @@ type Option = {
 
 export interface SlideMenuProps {
   options?: (Option | false)[]
+  shouldAwait?: boolean
 }
 
 const SlideMenuComponent: React.ForwardRefRenderFunction<
   SlideMenuHandles,
   SlideMenuProps
-> = ({ options }, ref) => {
+> = ({ options, shouldAwait }, ref) => {
   const modalRef = useRef<Modalize>(null)
 
-  const handlePress = useCallback(async (onPress: PressFunction) => {
-    const result = await onPress()
-    if (result === false) return
-    modalRef.current.close()
-  }, [])
+  const handlePress = useCallback(
+    async (onPress?: PressFunction) => {
+      if (shouldAwait === false) {
+        onPress?.()
+        modalRef.current?.close()
+      } else {
+        const result = await onPress?.()
+        if (result === false) return
+        modalRef.current?.close()
+      }
+    },
+    [shouldAwait]
+  )
 
   const renderItem = useCallback(
     ({ item, index }: { item: Option; index: number }) => {
