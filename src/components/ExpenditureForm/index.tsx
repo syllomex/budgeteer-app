@@ -6,11 +6,11 @@ import { yupResolver } from '@hookform/resolvers/yup'
 
 import { format } from 'date-fns'
 import { Modalize } from 'react-native-modalize'
+import { useCreateExpenditure } from '../../hooks/useCreateExpenditure'
 import { Button } from '../Button'
 import { ControlledInput } from '../Form/Input'
 import { Spacer } from '../Spacer'
 import styles from './styles'
-import { useCreateExpenditure } from './useCreateExpenditure'
 
 interface ExpenditureFormProps {
   categoryId?: string
@@ -32,11 +32,16 @@ const ExpenditureFormComponent: React.ForwardRefRenderFunction<
 > = ({ categoryId }, ref) => {
   const modalRef = useRef<Modalize>(null)
 
-  const { control, handleSubmit } = useForm({ resolver: yupResolver(schema) })
+  const { control, handleSubmit, reset } = useForm({
+    resolver: yupResolver(schema)
+  })
 
   const { onSubmit, loading } = useCreateExpenditure({
     categoryId,
-    onSuccess: () => modalRef.current?.close()
+    onSuccess: () => {
+      reset()
+      modalRef.current?.close()
+    }
   })
 
   useImperativeHandle(ref, () => ({ open: () => modalRef.current?.open() }))
