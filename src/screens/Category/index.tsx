@@ -41,7 +41,11 @@ export const Category: React.FunctionComponent = () => {
         </NoContent>
 
         {expenditures?.map(expenditure => (
-          <Item key={expenditure.id} data={expenditure} />
+          <Item
+            key={expenditure.id}
+            data={expenditure}
+            categoryId={params.category.id}
+          />
         ))}
       </ScrollView>
     </View>

@@ -1,18 +1,28 @@
 import { Feather } from '@expo/vector-icons'
 import React, { useRef } from 'react'
 import { TouchableOpacity, View } from 'react-native'
+import { LoadingOverlay } from '../../components/Loading'
 import { SlideMenu, SlideMenuHandles } from '../../components/SlideMenu'
 import { T } from '../../components/T'
 import { Expenditure } from '../../contexts/store'
+import { useDeleteExpenditure } from '../../hooks/useDeleteExpenditure'
 import { monetize, parseAndDisplay } from '../../utils'
 import styles from './item.styles'
 
 interface ItemProps {
   data: Expenditure
+  categoryId: string
 }
 
-export const Item: React.FunctionComponent<ItemProps> = ({ data }) => {
+export const Item: React.FunctionComponent<ItemProps> = ({
+  data,
+  categoryId
+}) => {
   const slideMenu = useRef<SlideMenuHandles>(null)
+
+  const { execute: deleteExpenditure, loading } = useDeleteExpenditure({
+    categoryId
+  })
 
   return (
     <TouchableOpacity
@@ -20,8 +30,11 @@ export const Item: React.FunctionComponent<ItemProps> = ({ data }) => {
       style={styles.container}
       onPress={() => slideMenu.current?.open()}
     >
+      <LoadingOverlay visible={loading} />
+
       <SlideMenu
         ref={slideMenu}
+        shouldAwait={false}
         options={[
           {
             label: 'Editar',
@@ -30,7 +43,7 @@ export const Item: React.FunctionComponent<ItemProps> = ({ data }) => {
           },
           {
             label: 'Remover',
-            onPress: () => {},
+            onPress: () => deleteExpenditure({ expenditureId: data.id }),
             color: 'danger',
             icon: props => <Feather name="trash" {...props} />
           }
