@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import Toast from 'react-native-toast-message'
-import { useAuth } from '../../contexts/auth'
-import { useStore } from '../../contexts/store'
+import { useAuth } from '../contexts/auth'
+import { useStore } from '../contexts/store'
 
 export const useCreateExpenditure = ({
   categoryId,
