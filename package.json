@@ -8,9 +8,11 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "gen:component": "ts-node scripts/generate-component --type component --name",
-    "gen:screen": "ts-node scripts/generate-component --type screen --name"
+    "gen:screen": "ts-node scripts/generate-component --type screen --name",
+    "codegen": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
+    "@apollo/client": "^3.6.9",
     "@expo-google-fonts/josefin-sans": "^0.2.2",
     "@expo/vector-icons": "^12.0.0",
     "@hookform/resolvers": "^2.8.8",
@@ -27,6 +29,7 @@
     "expo-font": "~10.0.4",
     "expo-splash-screen": "~0.14.1",
     "expo-status-bar": "~1.2.0",
+    "graphql": "^16.5.0",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-hook-form": "^7.30.0",
@@ -43,6 +46,12 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
+    "@graphql-codegen/cli": "2.6.2",
+    "@graphql-codegen/typescript": "2.5.1",
+    "@graphql-codegen/typescript-document-nodes": "2.2.13",
+    "@graphql-codegen/typescript-graphql-files-modules": "2.1.1",
+    "@graphql-codegen/typescript-operations": "2.4.2",
+    "@graphql-codegen/typescript-react-apollo": "3.2.16",
     "@types/react": "~17.0.21",
     "@types/react-native": "~0.64.12",
     "@typescript-eslint/eslint-plugin": "^5.20.0",

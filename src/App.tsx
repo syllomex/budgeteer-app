@@ -6,11 +6,13 @@ import { NavigationContainer } from '@react-navigation/native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import AppLoading from 'expo-app-loading'
+import { ApolloProvider } from '@apollo/client'
 import { AuthProvider } from './contexts/auth'
 import { RootStack } from './routes/RootStack'
 import { Toast } from './components/Toast'
 import { StoreProvider } from './contexts/store'
 import { useConfigureFonts } from './config/fonts'
+import { apollo } from './services/graphql'
 
 GoogleSignin.configure({
   webClientId: process.env.GOOGLE_WEB_CLIENT_ID,
@@ -36,13 +38,15 @@ export default function App () {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <NavigationContainer>
-        <AuthProvider>
-          <StoreProvider>
-            <AppComponent />
-          </StoreProvider>
-        </AuthProvider>
-      </NavigationContainer>
+      <ApolloProvider client={apollo}>
+        <NavigationContainer>
+          <AuthProvider>
+            <StoreProvider>
+              <AppComponent />
+            </StoreProvider>
+          </AuthProvider>
+        </NavigationContainer>
+      </ApolloProvider>
     </GestureHandlerRootView>
   )
 }

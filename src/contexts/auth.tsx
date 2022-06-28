@@ -13,6 +13,7 @@ import firestore from '@react-native-firebase/firestore'
 
 import { SetState } from '../utils/types'
 import { colors } from '../config/styles'
+import { setAuthorization } from '../services/graphql'
 
 type GoogleUser = {
   displayName: string
@@ -31,6 +32,8 @@ type User = GoogleUser
 interface AuthContext {
   user: User | null | undefined
   setUser: SetState<User | null>
+  idToken: string | null
+  setIdToken: SetState<string | null>
   initializing: boolean
   setInitializing: SetState<boolean>
   loading: boolean
@@ -43,9 +46,11 @@ const Auth = createContext({} as AuthContext)
 
 export const AuthProvider: PropsWithChildren<any> = ({ children }) => {
   const [user, setUser] = useState<User | null>()
+  const [idToken, setIdToken] = useState<string | null>()
   const [loading, setLoading] = useState(false)
   const [initializing, setInitializing] = useState(true)
   const [currentUser, setCurrentUser] = useState<CurrentUser | undefined>()
+  const [gettingTokens, setGettingTokens] = useState(false)
 
   const onAuthStateChanged = useCallback(
     user => {
@@ -85,11 +90,32 @@ export const AuthProvider: PropsWithChildren<any> = ({ children }) => {
     firestore().collection('users').doc(user.uid).set(user, { merge: true })
   }, [user])
 
+  useEffect(() => {
+    ;(async () => {
+      if (idToken) return
+      if (gettingTokens) return
+      if (!user) return
+
+      setGettingTokens(true)
+      const tokens = await GoogleSignin.getTokens()
+      setIdToken(tokens.idToken)
+      setGettingTokens(false)
+    })()
+  }, [gettingTokens, idToken, user])
+
+  useEffect(() => {
+    if (!idToken) return
+
+    setAuthorization(idToken)
+  }, [idToken])
+
   return (
     <Auth.Provider
       value={{
         user,
         setUser,
+        idToken,
+        setIdToken,
         initializing,
         setInitializing,
         loading,
@@ -117,13 +143,15 @@ export const AuthProvider: PropsWithChildren<any> = ({ children }) => {
 }
 
 export const useAuth = () => {
-  const { user, setLoading, currentUser, setCurrentUser } = useContext(Auth)
+  const { user, setLoading, currentUser, setCurrentUser, idToken, setIdToken } =
+    useContext(Auth)
 
   const signIn = useCallback(async () => {
     setLoading(true)
 
     try {
       const { idToken } = await GoogleSignin.signIn()
+      setIdToken(idToken)
       const googleCredential = auth.GoogleAuthProvider.credential(idToken)
       return auth().signInWithCredential(googleCredential)
     } catch (err) {
@@ -131,19 +159,20 @@ export const useAuth = () => {
     } finally {
       setLoading(false)
     }
-  }, [setLoading])
+  }, [setIdToken, setLoading])
 
   const revokeAndSignIn = useCallback(async () => {
     try {
       setLoading(true)
       setCurrentUser(undefined)
+      setIdToken(null)
       await GoogleSignin.revokeAccess()
     } catch (err) {
       //
     }
 
     await signIn()
-  }, [setCurrentUser, setLoading, signIn])
+  }, [setCurrentUser, setIdToken, setLoading, signIn])
 
   const signOut = useCallback(() => {
     auth().signOut()
@@ -154,6 +183,7 @@ export const useAuth = () => {
     signOut,
     user,
     currentUser,
-    revokeAndSignIn
+    revokeAndSignIn,
+    idToken
   }
 }
