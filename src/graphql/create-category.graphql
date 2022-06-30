@@ -1,0 +1,8 @@
+mutation CreateCategory($data: CreateCategoryInput!, $yearMonth: String!) {
+  createCategory(data: $data) {
+    id
+    name
+    yearMonth
+    totalExpenses(filter: { yearMonth: $yearMonth })
+  }
+}

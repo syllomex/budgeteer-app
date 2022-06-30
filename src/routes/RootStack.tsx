@@ -21,7 +21,8 @@ export const RootStack = () => {
           headerTitleStyle: {
             fontFamily: 'semiBold',
             color: colors['text-neutral']
-          }
+          },
+          headerShadowVisible: false
         }}
       >
         <Screen

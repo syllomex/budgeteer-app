@@ -1,0 +1,11 @@
+query GetMonthlySummary($yearMonth: String!) {
+  totalMonthlyIncomings(yearMonth: $yearMonth)
+  totalMonthlyExpenses(filter: { yearMonth: $yearMonth })
+  availableBudget(filter: { yearMonth: $yearMonth })
+  categories(filter: { yearMonth: $yearMonth }) {
+    id
+    yearMonth
+    name
+    totalExpenses(filter: { yearMonth: $yearMonth })
+  }
+}

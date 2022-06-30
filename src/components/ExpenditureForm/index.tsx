@@ -1,15 +1,23 @@
-import React, { forwardRef, useImperativeHandle, useRef } from 'react'
+import React, {
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useRef
+} from 'react'
 import { useForm } from 'react-hook-form'
 import { View } from 'react-native'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 
-import { format } from 'date-fns'
 import { Modalize } from 'react-native-modalize'
-import { useCreateExpenditure } from '../../hooks/useCreateExpenditure'
+
 import { Button } from '../Button'
 import { ControlledInput } from '../Form/Input'
 import { Spacer } from '../Spacer'
+import { ControlledDateTime } from '../Form/DateTime'
+import { useCreateCategoryExpenditureMutation } from '../../graphql/generated/graphql'
+import { useStore } from '../../contexts/store'
+import { showMessage } from '../../utils'
 import styles from './styles'
 
 interface ExpenditureFormProps {
@@ -20,10 +28,16 @@ export interface ExpenditureFormHandles {
   open(): void
 }
 
+type FormData = {
+  amount: number
+  description?: string
+  date?: string
+}
+
 const schema = yup.object().shape({
-  value: yup.number().required(),
+  amount: yup.number().required(),
   description: yup.string().nullable(),
-  date: yup.string().required()
+  date: yup.date().nullable()
 })
 
 const ExpenditureFormComponent: React.ForwardRefRenderFunction<
@@ -32,17 +46,37 @@ const ExpenditureFormComponent: React.ForwardRefRenderFunction<
 > = ({ categoryId }, ref) => {
   const modalRef = useRef<Modalize>(null)
 
+  const { yearMonth } = useStore()
   const { control, handleSubmit, reset } = useForm({
     resolver: yupResolver(schema)
   })
 
-  const { onSubmit, loading } = useCreateExpenditure({
-    categoryId,
-    onSuccess: () => {
-      reset()
-      modalRef.current?.close()
+  const [createExpenditure, { loading }] = useCreateCategoryExpenditureMutation(
+    {
+      refetchQueries: ['GetCategory', 'GetMonthlySummary'],
+      onCompleted () {
+        showMessage({ message: 'Despesa adicionada!' })
+        modalRef.current?.close()
+        reset()
+      },
+      onError (err) {
+        showMessage({
+          message: 'Não foi possível adicionar a despesa.',
+          description: err.message,
+          type: 'error'
+        })
+      }
     }
-  })
+  )
+
+  const onSubmit = useCallback(
+    async (formData: FormData) => {
+      await createExpenditure({
+        variables: { data: { ...formData, categoryId, yearMonth }, yearMonth }
+      })
+    },
+    [categoryId, createExpenditure, yearMonth]
+  )
 
   useImperativeHandle(ref, () => ({ open: () => modalRef.current?.open() }))
 
@@ -64,17 +98,17 @@ const ExpenditureFormComponent: React.ForwardRefRenderFunction<
 
         <ControlledInput
           control={control}
-          name="value"
+          name="amount"
           label="Valor"
           keyboardType="decimal-pad"
         />
         <Spacer height={1.8} />
 
-        <ControlledInput
+        <ControlledDateTime
           control={control}
           name="date"
           label="Data"
-          defaultValue={format(new Date(), 'yyyy-MM-dd')}
+          mode="datetime"
         />
 
         <Spacer height={3} />

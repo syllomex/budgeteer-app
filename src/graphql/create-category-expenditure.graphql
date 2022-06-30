@@ -1,0 +1,13 @@
+mutation CreateCategoryExpenditure(
+  $data: CreateCategoryExpenditureInput!
+  $yearMonth: String!
+) {
+  createCategoryExpenditure(data: $data) {
+    id
+    description
+    amount
+    date
+    numberOfInstallments
+    currentInstallment(yearMonth: $yearMonth)
+  }
+}

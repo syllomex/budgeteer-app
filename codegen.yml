@@ -1,5 +1,6 @@
 overwrite: true
-schema: "https://bdgteer.vercel.app/api/graphql"
+# schema: "https://bdgteer.vercel.app/api/graphql"
+schema: "http://localhost:3000/api/graphql"
 documents: "src/graphql/**/*.graphql"
 generates:
   src/graphql/generated/graphql.ts:
@@ -7,4 +8,3 @@ generates:
       - "typescript"
       - "typescript-operations"
       - "typescript-react-apollo"
-      - "typescript-document-nodes"

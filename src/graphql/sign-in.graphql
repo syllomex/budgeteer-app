@@ -1,0 +1,5 @@
+query SignIn($data: SignInWithIdTokenInput!) {
+  signInWithIdToken(data: $data) {
+    id
+  }
+}

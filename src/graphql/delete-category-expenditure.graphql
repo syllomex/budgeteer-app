@@ -1,0 +1,5 @@
+mutation DeleteCategoryExpenditure($id: String!) {
+  deleteCategoryExpenditure(id: $id) {
+    id
+  }
+}

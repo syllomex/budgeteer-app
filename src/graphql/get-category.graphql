@@ -1,0 +1,15 @@
+query GetCategory($id: String!, $yearMonth: String!) {
+  category(id: $id) {
+    id
+    name
+    totalExpenses
+    expenditures(filter: { yearMonth: $yearMonth }) {
+      id
+      description
+      amount
+      date
+      numberOfInstallments
+      currentInstallment(yearMonth: $yearMonth)
+    }
+  }
+}

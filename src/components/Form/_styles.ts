@@ -14,7 +14,9 @@ const formStyles = StyleSheet.create({
     fontSize: rem(1.4),
     color: colors['text-neutral']
   },
-  placeholder: {}
+  placeholder: {
+    color: colors.placeholder
+  }
 })
 
 export default formStyles

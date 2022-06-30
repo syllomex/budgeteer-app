@@ -4,187 +4,69 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useRef,
   useState
 } from 'react'
 import { Modalize } from 'react-native-modalize'
-import Toast from 'react-native-toast-message'
-import firestore, {
-  FirebaseFirestoreTypes
-} from '@react-native-firebase/firestore'
 
 import { addMonths, subMonths } from 'date-fns'
+import { NetworkStatus } from '@apollo/client'
 import { CategoryForm } from '../components/CategoryForm'
 import { getCurrentMonth, getDateByMonth } from '../utils'
 import { SetState } from '../utils/types'
+import {
+  GetMonthlySummaryQuery,
+  useGetMonthlySummaryQuery
+} from '../graphql/generated/graphql'
 import { useAuth } from './auth'
-
-type RefFunction =
-  FirebaseFirestoreTypes.Query<FirebaseFirestoreTypes.DocumentData>
-
-type CollectionRef =
-  FirebaseFirestoreTypes.CollectionReference<FirebaseFirestoreTypes.DocumentData>
-
-type Category = { uid: string; name: string; total?: number }
 
 const Store = createContext(
   {} as {
-    monthId?: string
-    setMonthId?: SetState<string>
     month: string
     setMonth: SetState<string>
     openCategoryModal(): void
-    categories?: Category[]
-    setCategories: SetState<Category[] | undefined>
-    total: number
-
-    getCategoriesRef(): CollectionRef | null
-    getCategoryExpendituresRef(categoryId: string): RefFunction | null
+    closeCategoryModal(): void
+    data: GetMonthlySummaryQuery
+    refetch(): Promise<GetMonthlySummaryQuery>
+    refreshing: boolean
   }
 )
 
-export const userStore = (userId: string) =>
-  firestore().collection('users').doc(userId)
-
 export const StoreProvider: FunctionComponent = ({ children }) => {
-  const { user } = useAuth()
-
   const categoryModalRef = useRef<Modalize>(null)
 
-  const [monthId, setMonthId] = useState<string>()
   const [month, setMonth] = useState(getCurrentMonth())
-  const [isMonthInit, setMonthInit] = useState(false)
 
-  const [categories, setCategories] = useState<Category[]>()
-
-  const initMonth = useCallback(async () => {
-    if (!user) return
-    const result = await userStore(user.uid)
-      .collection('months')
-      .where('month', '==', month)
-      .limit(1)
-      .get()
-
-    const exists = result.docs[0]
-
-    const createMonth = () => {
-      return userStore(user.uid).collection('months').add({
-        typename: 'Month',
-        month
-      })
-    }
-
-    const doc = exists ?? (await createMonth())
-
-    setMonthId(doc.id)
-    setMonthInit(true)
-  }, [month, user])
-
-  const initCategories = useCallback(() => {
-    if (!user) return
-    const subscriber = userStore(user.uid)
-      .collection('months')
-      .doc(monthId)
-      .collection('categories')
-      .orderBy('name')
-      .onSnapshot(async snapshot => {
-        const arr = []
-
-        await Promise.all(
-          snapshot.docs.map(async doc => {
-            const data = {
-              uid: doc.id,
-              name: doc.data().name,
-              total: doc.data().total
-            }
-
-            arr.push(data)
-          })
-        )
-
-        setCategories(arr)
-      })
-
-    return subscriber
-  }, [monthId, user])
-
-  const getCategoriesRef = useCallback(() => {
-    if (!user) return null
-
-    return userStore(user.uid)
-      .collection('months')
-      .doc(monthId)
-      .collection('categories')
-  }, [monthId, user])
-
-  const getCategoryExpendituresRef = useCallback(
-    (categoryId: string) => {
-      const categoriesRef = getCategoriesRef()
-      if (!categoriesRef) return null
-
-      return categoriesRef
-        .doc(categoryId)
-        .collection('expenditures')
-        .orderBy('createdAt', 'desc')
-    },
-    [getCategoriesRef]
-  )
+  const { user, idToken } = useAuth()
+  const { data, refetch, networkStatus } = useGetMonthlySummaryQuery({
+    skip: !idToken,
+    variables: { yearMonth: month }
+  })
 
   const openCategoryModal = useCallback(() => {
     categoryModalRef.current.open()
   }, [])
 
-  const submitCategory = useCallback(
-    async formData => {
-      if (!monthId) return
-      if (!formData.name) return
-      if (!user) return
-
-      await userStore(user.uid)
-        .collection('months')
-        .doc(monthId)
-        .collection('categories')
-        .add({ typename: 'Category', ...formData, total: 0 })
-
-      Toast.show({ type: 'success', text1: 'Categoria adicionada!' })
-      categoryModalRef.current.close()
-    },
-    [monthId, user]
-  )
-
-  useEffect(() => {
-    initMonth()
-  }, [initMonth])
+  const closeCategoryModal = useCallback(() => {
+    categoryModalRef.current.close()
+  }, [])
 
   useEffect(() => {
     if (!user) setMonth(getCurrentMonth())
   }, [user])
 
-  useEffect(() => {
-    if (!isMonthInit) return
-    const subscriber = initCategories()
-    return subscriber
-  }, [initCategories, isMonthInit])
-
-  const total = useMemo(
-    () => categories?.reduce((acc, cur) => acc + (cur.total ?? 0), 0),
-    [categories]
-  )
-
   return (
     <Store.Provider
       value={{
-        monthId,
-        setMonthId,
         month,
         setMonth,
         openCategoryModal,
-        categories,
-        setCategories,
-        total,
-        getCategoriesRef,
-        getCategoryExpendituresRef
+        closeCategoryModal,
+        data,
+        refetch: async () => {
+          return (await refetch()).data
+        },
+        refreshing: networkStatus === NetworkStatus.refetch
       }}
     >
       {children}
@@ -194,7 +76,10 @@ export const StoreProvider: FunctionComponent = ({ children }) => {
         adjustToContentHeight
         scrollViewProps={{ keyboardShouldPersistTaps: 'always' }}
       >
-        <CategoryForm onSubmit={submitCategory} />
+        <CategoryForm
+          yearMonth={month}
+          closeCategoryModal={closeCategoryModal}
+        />
       </Modalize>
     </Store.Provider>
   )
@@ -202,25 +87,21 @@ export const StoreProvider: FunctionComponent = ({ children }) => {
 
 export const useStore = () => {
   const store = useContext(Store)
-  const { setMonth, month, setCategories } = store
+  const { setMonth, month } = store
 
   const goToNextMonth = useCallback(() => {
-    setCategories(undefined)
-
     const current = getDateByMonth(month)
     const next = addMonths(current, 1)
     setMonth(getCurrentMonth(next))
-  }, [month, setCategories, setMonth])
+  }, [month, setMonth])
 
   const goToPrevMonth = useCallback(() => {
-    setCategories(undefined)
-
     const current = getDateByMonth(month)
     const prev = subMonths(current, 1)
     setMonth(getCurrentMonth(prev))
-  }, [month, setCategories, setMonth])
+  }, [month, setMonth])
 
-  return { ...store, goToNextMonth, goToPrevMonth }
+  return { ...store, goToNextMonth, goToPrevMonth, yearMonth: month }
 }
 
 export type Expenditure = {
@@ -229,35 +110,4 @@ export type Expenditure = {
   description?: string
   value: number
   createdAt: string
-}
-
-export const useCategory = (categoryId: string) => {
-  const [expenditures, setExpenditures] = useState<Expenditure[]>()
-
-  const { getCategoryExpendituresRef } = useStore()
-
-  useEffect(() => {
-    const ref = getCategoryExpendituresRef(categoryId)
-    const subscriber = ref.onSnapshot(snapshot => {
-      const formatted = snapshot.docs.map(doc => {
-        const docData = doc.data()
-
-        return {
-          id: doc.id,
-          date: docData.date,
-          description: docData.description,
-          value: docData.value,
-          createdAt: docData.createdAt
-        }
-      })
-
-      setExpenditures(formatted)
-    })
-
-    return subscriber
-  }, [categoryId, getCategoryExpendituresRef])
-
-  return {
-    expenditures
-  }
 }

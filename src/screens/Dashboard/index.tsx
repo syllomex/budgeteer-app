@@ -1,20 +1,28 @@
-import React from 'react'
-import { ActivityIndicator, ScrollView, View } from 'react-native'
-
+import React, { useMemo } from 'react'
+import { RefreshControl, ScrollView, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import { colors } from '../../config/styles'
-import { useDashboard } from '../../hooks'
+
 import { MonthSelector } from '../../components/MonthSelector'
 import { NoContent } from '../../components/NoContent'
 import { FloatingButton } from '../../components/FloatingButton'
+import { LoadingIndicator } from '../../components/Loading'
+
 import { useStore } from '../../contexts/store'
+
 import { Category, NewCategoryButton } from './category'
+
 import styles from './styles'
 
 export const Dashboard = () => {
-  const { categories } = useDashboard()
+  const { openCategoryModal, data, refetch, refreshing } = useStore()
 
-  const { openCategoryModal } = useStore()
+  const categories = useMemo(() => {
+    if (!data) return null
+
+    return [...data.categories].sort((a, b) => {
+      return b.totalExpenses - a.totalExpenses
+    })
+  }, [data])
 
   return (
     <View style={styles.container}>
@@ -23,25 +31,28 @@ export const Dashboard = () => {
         icon={props => <Ionicons {...props} name="add-outline" />}
       />
 
-      <ScrollView contentContainerStyle={styles.contentContainer}>
+      <ScrollView
+        contentContainerStyle={styles.contentContainer}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={refetch} />
+        }
+      >
         <MonthSelector />
 
         <View style={styles.categoriesContainer}>
-          {!categories
-            ? (
-            <ActivityIndicator size="large" color={colors.primary} />
-              )
-            : (
+          {!categories ? (
+            <LoadingIndicator />
+          ) : (
             <View>
               <NoContent visible={categories.length === 0}>
                 Nada cadastrado nesse mês
               </NoContent>
 
               {categories.map(category => (
-                <Category key={category.uid} data={category} />
+                <Category key={category.id} data={category} />
               ))}
             </View>
-              )}
+          )}
 
           {categories?.length === 0 && (
             <NewCategoryButton center textColor="primary" />
