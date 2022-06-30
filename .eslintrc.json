@@ -22,7 +22,8 @@
     "import/no-cycle": "warn",
     "import/first": "warn",
     "import/order": "warn",
-    "camelcase": "off"
+    "camelcase": "off",
+    "multiline-ternary": "off"
   },
   "settings": {
     "react": {
