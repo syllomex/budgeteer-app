@@ -20,5 +20,6 @@ export const colors = {
   'text-in-primary': '#FFFFFF',
   success: '#66AAEE',
   warning: '#FFFF66',
-  danger: '#EE6666'
+  danger: '#EE6666',
+  'color-overlay': '#00000044'
 }

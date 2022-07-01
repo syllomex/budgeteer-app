@@ -6,6 +6,7 @@ import { Button } from '../../components/Button'
 import { ControlledInput } from '../../components/Form/Input'
 import { useCreateCategoryMutation } from '../../graphql/generated/graphql'
 import { showMessage } from '../../utils/message'
+import { ControlledYearMonth } from '../Form/YearMonth'
 import { Spacer } from '../Spacer'
 
 import styles from './styles'
@@ -39,8 +40,16 @@ export const CategoryForm: React.FunctionComponent<CategoryFormProps> = ({
   const submit = useCallback(
     async formData => {
       if (!formData.name) return
-
-      await createCategory({ variables: { data: formData, yearMonth } })
+      await createCategory({
+        variables: {
+          data: {
+            ...formData,
+            permanent: !!formData.permanentUntilYearMonth,
+            yearMonth
+          },
+          yearMonth
+        }
+      })
     },
     [createCategory, yearMonth]
   )
@@ -55,7 +64,13 @@ export const CategoryForm: React.FunctionComponent<CategoryFormProps> = ({
         onSubmitEditing={handleSubmit(submit)}
       />
 
-      <Spacer height={3} />
+      <ControlledYearMonth
+        control={control}
+        name="permanentUntilYearMonth"
+        label="Repetir mensalmente até"
+      />
+
+      <Spacer height={1.4} />
       <Button loading={creating} onPress={handleSubmit(submit)}>
         Salvar
       </Button>

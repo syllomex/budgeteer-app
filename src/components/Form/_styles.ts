@@ -7,7 +7,8 @@ const formStyles = StyleSheet.create({
     padding: rem(0.8),
     borderWidth: rem(0.1),
     borderColor: colors['border-line'],
-    backgroundColor: colors['background-light']
+    backgroundColor: colors['background-light'],
+    marginBottom: rem(1.6)
   },
   inputText: {
     fontFamily: 'regular',

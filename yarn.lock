@@ -2414,7 +2414,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@17.0.21":
+"@types/react@*":
   version "17.0.21"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.21.tgz#069c43177cd419afaab5ce26bb4e9056549f7ea6"
   integrity sha512-GzzXCpOthOjXvrAUFQwU/svyxu658cwu00Q9ugujS4qc1zXgLFaO0kS2SLOaMWLt2Jik781yuHCWB7UcYdGAeQ==
@@ -6776,6 +6776,11 @@ mkdirp@^1.0.4:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
+moment@^2.24.0:
+  version "2.29.3"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.3.tgz#edd47411c322413999f7a5940d526de183c031f3"
+  integrity sha512-c6YRvhEo//6T2Jz/vVtYzqBzwvPT95JBQ+smCytzf7c50oMZRsR/a4w88aD34I+/QVSfnoAnSBFPJHItlOMJVw==
+
 ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
@@ -7628,6 +7633,14 @@ react-native-gesture-handler@^2.4.1:
 react-native-modalize@syllomex/react-native-modalize#dev:
   version "2.0.13"
   resolved "https://codeload.github.com/syllomex/react-native-modalize/tar.gz/0793430a7d6652195bc43da5c632c234540b0b76"
+
+react-native-month-year-picker@^1.8.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/react-native-month-year-picker/-/react-native-month-year-picker-1.8.1.tgz#914378033535e8627355f927139d41ae45a58a34"
+  integrity sha512-96S/stxggCAEtjC3YqS3UNDaNhndknPH3s24sVMyiXeyoKJKbMCohy7AJJQAV29QSXtnHe3ULRcJL5Wz4VJCtA==
+  dependencies:
+    invariant "^2.2.4"
+    moment "^2.24.0"
 
 react-native-reanimated@^2.8.0:
   version "2.8.0"
