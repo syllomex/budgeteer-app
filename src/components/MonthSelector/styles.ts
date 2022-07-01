@@ -7,13 +7,15 @@ const styles = StyleSheet.create({
   },
   monthSelectorRow: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    paddingHorizontal: rem(2.4)
   },
   arrowContainer: {
     padding: rem(0.8)
   },
   monthSelectorTextContainer: {
-    alignItems: 'center'
+    alignItems: 'center',
+    flex: 1
   }
 })
 

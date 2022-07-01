@@ -26,9 +26,10 @@ const Store = createContext(
     setMonth: SetState<string>
     openCategoryModal(): void
     closeCategoryModal(): void
-    data: GetMonthlySummaryQuery
+    data: GetMonthlySummaryQuery | undefined
     refetch(): Promise<GetMonthlySummaryQuery>
     refreshing: boolean
+    fetching: boolean
   }
 )
 
@@ -40,15 +41,16 @@ export const StoreProvider: FunctionComponent = ({ children }) => {
   const { user, idToken } = useAuth()
   const { data, refetch, networkStatus } = useGetMonthlySummaryQuery({
     skip: !idToken,
-    variables: { yearMonth: month }
+    variables: { yearMonth: month },
+    fetchPolicy: 'cache-and-network'
   })
 
   const openCategoryModal = useCallback(() => {
-    categoryModalRef.current.open()
+    categoryModalRef.current?.open()
   }, [])
 
   const closeCategoryModal = useCallback(() => {
-    categoryModalRef.current.close()
+    categoryModalRef.current?.close()
   }, [])
 
   useEffect(() => {
@@ -66,7 +68,9 @@ export const StoreProvider: FunctionComponent = ({ children }) => {
         refetch: async () => {
           return (await refetch()).data
         },
-        refreshing: networkStatus === NetworkStatus.refetch
+        refreshing:
+          networkStatus === NetworkStatus.refetch,
+        fetching: !!data && networkStatus === NetworkStatus.setVariables
       }}
     >
       {children}

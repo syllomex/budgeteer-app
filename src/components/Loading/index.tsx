@@ -1,6 +1,31 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { ActivityIndicator, Modal, View } from 'react-native'
 import { colors } from '../../config/styles'
+
+export const useLoadingText = ({
+  enabled,
+  text
+}: {
+  enabled: boolean
+  text: string
+}) => {
+  const [count, setCount] = useState(1)
+
+  useEffect(() => {
+    if (!enabled) return
+
+    const interval = setInterval(() => {
+      setCount(current => {
+        const next = (current += 1)
+        return next === 4 ? 1 : next
+      })
+    }, 300)
+
+    return () => clearInterval(interval)
+  }, [enabled])
+
+  return `${text}${new Array(count).fill('.').join('')}`
+}
 
 export const LoadingIndicator = () => {
   return <ActivityIndicator size="large" color={colors.primary} />
