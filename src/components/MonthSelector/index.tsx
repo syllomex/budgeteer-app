@@ -1,10 +1,11 @@
 import { MaterialIcons } from '@expo/vector-icons'
-import React, { useMemo } from 'react'
+import React, { useMemo, useRef } from 'react'
 import { View, TouchableOpacity } from 'react-native'
 import { colors, rem } from '../../config/styles'
 
 import { useDashboard } from '../../hooks'
 import { displayYearMonth, monetize } from '../../utils'
+import { YearMonthPicker, YearMonthPickerHandles } from '../Form/YearMonth'
 import { useLoadingText } from '../Loading'
 import { T } from '../T'
 import styles from './styles'
@@ -15,7 +16,11 @@ const arrowProps = {
 }
 
 export const MonthSelector: React.FunctionComponent = () => {
-  const { month, goToPrevMonth, goToNextMonth, data, fetching } = useDashboard()
+  const yearMonthPicker = useRef<YearMonthPickerHandles>(null)
+
+  const { month, goToPrevMonth, goToNextMonth, data, fetching, setMonth } =
+    useDashboard()
+
   const refreshingText = useLoadingText({
     enabled: fetching,
     text: 'Atualizando'
@@ -29,16 +34,21 @@ export const MonthSelector: React.FunctionComponent = () => {
 
   return (
     <View style={styles.monthSelectorContainer}>
+      <YearMonthPicker ref={yearMonthPicker} onSelect={setMonth} />
+
       <View style={styles.monthSelectorRow}>
         <TouchableOpacity style={styles.arrowContainer} onPress={goToPrevMonth}>
           <MaterialIcons name="arrow-back" {...arrowProps} />
         </TouchableOpacity>
-        <View style={styles.monthSelectorTextContainer}>
+        <TouchableOpacity
+          onPress={() => yearMonthPicker.current?.open()}
+          style={styles.monthSelectorTextContainer}
+        >
           <T f="semiBold" s={1.6}>
             {displayYearMonth(month)}
           </T>
           <T c="muted">{description}</T>
-        </View>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.arrowContainer} onPress={goToNextMonth}>
           <MaterialIcons name="arrow-forward" {...arrowProps} />
         </TouchableOpacity>

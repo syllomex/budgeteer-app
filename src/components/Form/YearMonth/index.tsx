@@ -19,7 +19,7 @@ interface YearMonthPickerProps {
   onSelect?: (yearMonth: string) => void
 }
 
-interface YearMonthPickerHandles {
+export interface YearMonthPickerHandles {
   open(): void
 }
 
