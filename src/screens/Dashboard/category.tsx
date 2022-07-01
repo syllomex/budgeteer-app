@@ -1,14 +1,19 @@
-import React from 'react'
+import React, { useCallback, useRef } from 'react'
 import { TouchableOpacity, View } from 'react-native'
 
-import { Ionicons } from '@expo/vector-icons'
+import { Feather, Ionicons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
 import { T } from '../../components/T'
-import { monetize, PropType, Unpacked } from '../../utils'
+import { monetize, PropType, showMessage, Unpacked } from '../../utils'
 import { colors, rem } from '../../config/styles'
 import { useStore } from '../../contexts/store'
 import { RootStackRouteList } from '../../routes/types'
-import { GetMonthlySummaryQuery } from '../../graphql/generated/graphql'
+import {
+  GetMonthlySummaryQuery,
+  useDeleteCategoryMutation
+} from '../../graphql/generated/graphql'
+import { SlideMenu, SlideMenuHandles } from '../../components/SlideMenu'
+import { LoadingOverlay } from '../../components/Loading'
 import styles from './category.styles'
 
 interface CategoryProps {
@@ -16,7 +21,24 @@ interface CategoryProps {
 }
 
 export const Category: React.FunctionComponent<CategoryProps> = ({ data }) => {
+  const slideMenu = useRef<SlideMenuHandles>(null)
+
   const { navigate } = useNavigation<RootStackRouteList>()
+
+  const [deleteCategory, { loading }] = useDeleteCategoryMutation({
+    variables: { id: data.id },
+    refetchQueries: ['GetMonthlySummary'],
+    onCompleted () {
+      showMessage({ message: 'Categoria removida!' })
+    },
+    onError (err) {
+      showMessage({
+        message: 'Não foi possível remover a categoria.',
+        description: err.message,
+        type: 'error'
+      })
+    }
+  })
 
   const handlePress = () => {
     navigate('Category', {
@@ -27,8 +49,33 @@ export const Category: React.FunctionComponent<CategoryProps> = ({ data }) => {
     })
   }
 
+  const handleDelete = useCallback(async () => {
+    await deleteCategory()
+    return true
+  }, [deleteCategory])
+
   return (
-    <TouchableOpacity onPress={handlePress} style={styles.container}>
+    <TouchableOpacity
+      onPress={handlePress}
+      onLongPress={() => slideMenu.current?.open()}
+      delayLongPress={100}
+      style={styles.container}
+    >
+      <LoadingOverlay visible={loading} />
+
+      <SlideMenu
+        ref={slideMenu}
+        shouldAwait={false}
+        options={[
+          {
+            label: 'Remover',
+            color: 'danger',
+            icon: props => <Feather name="trash" {...props} />,
+            onPress: handleDelete
+          }
+        ]}
+      />
+
       <View style={styles.row}>
         <T style={{ flex: 1 }}>{data.name}</T>
         <T>{monetize(data.totalExpenses ?? 0)}</T>

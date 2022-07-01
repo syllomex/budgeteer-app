@@ -25,3 +25,18 @@ export const parseAndDisplay = (
 export const displayDate = (date: Date, displayFormat = 'P') => {
   return format(date, displayFormat, { locale: ptBR })
 }
+
+export const yearMonthToDate = (yearMonth?: string) => {
+  if (!yearMonth) return null
+  const [year, month] = yearMonth.split('-').map(v => parseInt(v))
+
+  const date = new Date()
+  date.setFullYear(year)
+  date.setMonth(month - 1)
+
+  return date
+}
+
+export const dateToYearMonth = (date: Date) => {
+  return format(date, 'yyyy-MM', { locale: ptBR })
+}
