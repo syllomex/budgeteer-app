@@ -10,6 +10,11 @@ const formStyles = StyleSheet.create({
     backgroundColor: colors['background-light'],
     marginBottom: rem(1.6)
   },
+  inputTextContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
   inputText: {
     fontFamily: 'regular',
     fontSize: rem(1.4),

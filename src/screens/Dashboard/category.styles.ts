@@ -3,12 +3,22 @@ import { rem } from '../../config/styles'
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: rem(0.8)
+    marginRight: rem(-1)
   },
   row: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center'
+  },
+  innerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    flex: 1
+  },
+  iconContainer: {
+    paddingTop: rem(1.3),
+    paddingBottom: rem(1.1),
+    paddingHorizontal: rem(1),
+    alignItems: 'flex-end'
   }
 })
 

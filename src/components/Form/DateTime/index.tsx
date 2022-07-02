@@ -1,20 +1,21 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Control, Controller } from 'react-hook-form'
-import { TextInput, TouchableOpacity } from 'react-native'
+import { TextInput, TouchableOpacity, View } from 'react-native'
 import DatePicker from 'react-native-date-picker'
 
 import styles from '../_styles'
 
 import { Label } from '../Label'
 import { displayDate, parseDate } from '../../../utils'
+import { ClearButton } from '../ClearButton'
 
 interface FormattedReturnProps {
-  onChange?: (date: string) => any | Promise<any>
+  onChange?: (date: string | null) => any | Promise<any>
   returnFormat: string
 }
 
 interface RawReturnProps {
-  onChange?: (date: Date) => any | Promise<any>
+  onChange?: (date: Date | null) => any | Promise<any>
   returnFormat?: never
 }
 
@@ -25,6 +26,7 @@ type DateTimeProps = ReturnProps & {
   defaultValue?: Date | string
   value?: Date | string
   mode?: 'date' | 'time' | 'datetime'
+  clearEnabled?: boolean
 }
 
 const formatReturnValue = (value: string | Date, returnFormat?: string) => {
@@ -47,7 +49,8 @@ export const DateTime: React.FunctionComponent<DateTimeProps> = ({
   defaultValue,
   returnFormat,
   value,
-  mode = 'date'
+  mode = 'date',
+  clearEnabled
 }) => {
   const [open, setOpen] = useState(false)
   const [date, setDate] = useState(
@@ -64,16 +67,24 @@ export const DateTime: React.FunctionComponent<DateTimeProps> = ({
     return 'Pp'
   }, [mode])
 
+  const clear = useCallback(() => {
+    onChange?.(null)
+    setDate(null)
+  }, [onChange])
+
   return (
     <>
       {!!label && <Label>{label}</Label>}
 
       <TouchableOpacity style={styles.container} onPress={() => setOpen(true)}>
-        <TextInput
-          style={[styles.inputText, !date && styles.placeholder]}
-          editable={false}
-          value={date ? displayDate(date, displayFormat) : 'Selecionar data'}
-        />
+        <View style={styles.inputTextContainer}>
+          <TextInput
+            style={[styles.inputText, !date && styles.placeholder]}
+            editable={false}
+            value={date ? displayDate(date, displayFormat) : 'Selecionar data'}
+          />
+          {clearEnabled && !!date && <ClearButton onPress={clear} />}
+        </View>
       </TouchableOpacity>
 
       <DatePicker
@@ -95,7 +106,7 @@ export const DateTime: React.FunctionComponent<DateTimeProps> = ({
 }
 
 type ControlledDateTimeProps = DateTimeProps & {
-  control: Control
+  control: Control<any>
   name: string
 }
 
@@ -118,10 +129,10 @@ export const ControlledDateTime: React.FunctionComponent<
         <DateTime
           {...props}
           value={field.value}
-          onChange={date => {
+          onChange={(date: string | Date | null) => {
             field.onChange(date)
             field.onBlur()
-            props.onChange?.(date)
+            props.onChange?.(date as string & Date)
           }}
         />
       )}

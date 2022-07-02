@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { View } from 'react-native'
 
@@ -6,6 +6,7 @@ import { Button } from '../../components/Button'
 import { ControlledInput } from '../../components/Form/Input'
 import { useCreateCategoryMutation } from '../../graphql/generated/graphql'
 import { showMessage } from '../../utils/message'
+import { ControlledSwitch } from '../Form/Switch'
 import { ControlledYearMonth } from '../Form/YearMonth'
 import { Spacer } from '../Spacer'
 
@@ -21,6 +22,8 @@ export const CategoryForm: React.FunctionComponent<CategoryFormProps> = ({
   yearMonth
 }) => {
   const { control, handleSubmit } = useForm()
+
+  const [repeat, setRepeat] = useState(false)
 
   const [createCategory, { loading: creating }] = useCreateCategoryMutation({
     onCompleted () {
@@ -40,16 +43,21 @@ export const CategoryForm: React.FunctionComponent<CategoryFormProps> = ({
   const submit = useCallback(
     async formData => {
       if (!formData.name) return
+
       await createCategory({
         variables: {
           data: {
-            ...formData,
-            permanent: !!formData.permanentUntilYearMonth,
+            name: formData.name,
+            permanent: formData.permanent,
+            permanentUntilYearMonth: formData.permanent
+              ? formData.permanentUntilYearMonth
+              : null,
             yearMonth
           },
           yearMonth
         }
       })
+      setRepeat(false)
     },
     [createCategory, yearMonth]
   )
@@ -62,13 +70,24 @@ export const CategoryForm: React.FunctionComponent<CategoryFormProps> = ({
         label="Nome da categoria"
         autoFocus
         onSubmitEditing={handleSubmit(submit)}
+        required
       />
 
-      <ControlledYearMonth
+      <ControlledSwitch
         control={control}
-        name="permanentUntilYearMonth"
-        label="Repetir mensalmente até"
+        name="permanent"
+        label="Repetir"
+        onChange={setRepeat}
       />
+
+      {repeat && (
+        <ControlledYearMonth
+          control={control}
+          name="permanentUntilYearMonth"
+          placeholder="Permanentemente"
+          label="Até"
+        />
+      )}
 
       <Spacer height={1.4} />
       <Button loading={creating} onPress={handleSubmit(submit)}>

@@ -13,11 +13,15 @@ import { addMonths, subMonths } from 'date-fns'
 import { NetworkStatus } from '@apollo/client'
 import { CategoryForm } from '../components/CategoryForm'
 import { getCurrentMonth, getDateByMonth } from '../utils'
-import { SetState } from '../utils/types'
+import { PropType, SetState } from '../utils/types'
 import {
   GetMonthlySummaryQuery,
   useGetMonthlySummaryQuery
 } from '../graphql/generated/graphql'
+import {
+  ExpenditureForm,
+  ExpenditureFormHandles
+} from '../components/ExpenditureForm'
 import { useAuth } from './auth'
 
 const Store = createContext(
@@ -26,6 +30,8 @@ const Store = createContext(
     setMonth: SetState<string>
     openCategoryModal(): void
     closeCategoryModal(): void
+    openExpenditureModal?: PropType<ExpenditureFormHandles, 'open'>
+    closeExpenditureModal?: PropType<ExpenditureFormHandles, 'close'>
     data: GetMonthlySummaryQuery | undefined
     refetch(): Promise<GetMonthlySummaryQuery>
     refreshing: boolean
@@ -35,6 +41,7 @@ const Store = createContext(
 
 export const StoreProvider: FunctionComponent = ({ children }) => {
   const categoryModalRef = useRef<Modalize>(null)
+  const expenditureFormRef = useRef<ExpenditureFormHandles>(null)
 
   const [month, setMonth] = useState(getCurrentMonth())
 
@@ -53,6 +60,14 @@ export const StoreProvider: FunctionComponent = ({ children }) => {
     categoryModalRef.current?.close()
   }, [])
 
+  const openExpenditureModal = useCallback(props => {
+    expenditureFormRef.current?.open(props)
+  }, [])
+
+  const closeExpenditureModal = useCallback(() => {
+    expenditureFormRef.current?.close()
+  }, [])
+
   useEffect(() => {
     if (!user) setMonth(getCurrentMonth())
   }, [user])
@@ -64,12 +79,13 @@ export const StoreProvider: FunctionComponent = ({ children }) => {
         setMonth,
         openCategoryModal,
         closeCategoryModal,
+        openExpenditureModal,
+        closeExpenditureModal,
         data,
         refetch: async () => {
           return (await refetch()).data
         },
-        refreshing:
-          networkStatus === NetworkStatus.refetch,
+        refreshing: networkStatus === NetworkStatus.refetch,
         fetching: !!data && networkStatus === NetworkStatus.setVariables
       }}
     >
@@ -85,6 +101,8 @@ export const StoreProvider: FunctionComponent = ({ children }) => {
           closeCategoryModal={closeCategoryModal}
         />
       </Modalize>
+
+      <ExpenditureForm ref={expenditureFormRef} yearMonth={month} />
     </Store.Provider>
   )
 }

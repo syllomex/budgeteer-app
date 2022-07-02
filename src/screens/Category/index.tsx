@@ -36,6 +36,7 @@ export const Category: React.FunctionComponent = () => {
       <ExpenditureForm
         ref={expenditureFormRef}
         categoryId={params.category.id}
+        yearMonth={yearMonth}
       />
 
       <FloatingButton

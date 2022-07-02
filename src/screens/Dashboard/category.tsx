@@ -24,6 +24,7 @@ export const Category: React.FunctionComponent<CategoryProps> = ({ data }) => {
   const slideMenu = useRef<SlideMenuHandles>(null)
 
   const { navigate } = useNavigation<RootStackRouteList>()
+  const { openExpenditureModal } = useStore()
 
   const [deleteCategory, { loading }] = useDeleteCategoryMutation({
     variables: { id: data.id },
@@ -65,8 +66,14 @@ export const Category: React.FunctionComponent<CategoryProps> = ({ data }) => {
 
       <SlideMenu
         ref={slideMenu}
+        title={data.name}
         shouldAwait={false}
         options={[
+          {
+            label: 'Adicionar despesa',
+            icon: props => <Ionicons name="cart-outline" {...props} />,
+            onPress: () => openExpenditureModal?.({ categoryId: data.id })
+          },
           {
             label: 'Remover',
             color: 'danger',
@@ -77,8 +84,16 @@ export const Category: React.FunctionComponent<CategoryProps> = ({ data }) => {
       />
 
       <View style={styles.row}>
-        <T style={{ flex: 1 }}>{data.name}</T>
-        <T>{monetize(data.totalExpenses ?? 0)}</T>
+        <View style={styles.innerRow}>
+          <T style={{ flex: 1 }}>{data.name}</T>
+          <T>{monetize(data.totalExpenses ?? 0)}</T>
+        </View>
+        <TouchableOpacity
+          style={styles.iconContainer}
+          onPress={() => slideMenu.current?.open()}
+        >
+          <Ionicons name="ellipsis-vertical" />
+        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   )

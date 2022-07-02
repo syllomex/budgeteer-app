@@ -7,7 +7,13 @@ import React, {
   useRef
 } from 'react'
 import { Control, Controller } from 'react-hook-form'
-import { TextInput, TouchableOpacity, View } from 'react-native'
+import {
+  StyleProp,
+  TextInput,
+  TouchableOpacity,
+  View,
+  ViewStyle
+} from 'react-native'
 import Picker from 'react-native-month-year-picker'
 import { dateToYearMonth, displayDate, yearMonthToDate } from '../../../utils'
 import { Label } from '../Label'
@@ -56,20 +62,24 @@ export const YearMonthPicker = forwardRef(YearMonthPickerComponent)
 interface YearMonthProps extends YearMonthPickerProps {
   label?: string
   required?: boolean
+  placeholder?: string
+  containerStyle?: StyleProp<ViewStyle>
 }
 
 export const YearMonth: FunctionComponent<YearMonthProps> = ({
   defaultValue,
   label,
   required,
-  onSelect
+  placeholder,
+  onSelect,
+  containerStyle
 }) => {
   const ref = useRef<YearMonthPickerHandles>(null)
 
   const [value, setValue] = useState<string | undefined>(defaultValue)
 
   return (
-    <View>
+    <View style={containerStyle}>
       {!!label && <Label required={required}>{label}</Label>}
 
       <TouchableOpacity
@@ -77,12 +87,12 @@ export const YearMonth: FunctionComponent<YearMonthProps> = ({
         style={styles.container}
       >
         <TextInput
-          style={styles.inputText}
+          style={[styles.inputText, !value && styles.placeholder]}
           editable={false}
           value={
             value
               ? displayDate(yearMonthToDate(value) as Date, "MMMM'/'yyyy")
-              : 'Selecionar mês/ano'
+              : placeholder ?? 'Selecionar mês/ano'
           }
         />
       </TouchableOpacity>
@@ -100,7 +110,7 @@ export const YearMonth: FunctionComponent<YearMonthProps> = ({
 }
 
 interface ControlledYearMonthProps extends YearMonthProps {
-  control: Control
+  control: Control<any>
   name: string
 }
 

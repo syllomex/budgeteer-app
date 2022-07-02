@@ -1,5 +1,11 @@
 import React from 'react'
-import { TextInput, TextInputProps, View } from 'react-native'
+import {
+  StyleProp,
+  TextInput,
+  TextInputProps,
+  View,
+  ViewStyle
+} from 'react-native'
 import { Control, Controller } from 'react-hook-form'
 import { Label } from '../Label'
 import formStyles from '../_styles'
@@ -8,15 +14,17 @@ import { colors } from '../../../config/styles'
 interface InputProps extends TextInputProps {
   label?: string
   required?: boolean
+  containerStyle?: StyleProp<ViewStyle>
 }
 
 export const Input: React.FunctionComponent<InputProps> = ({
   label,
   required,
+  containerStyle,
   ...props
 }) => {
   return (
-    <View>
+    <View style={containerStyle}>
       {!!label && <Label required={required}>{label}</Label>}
       <View style={formStyles.container}>
         <TextInput
@@ -31,7 +39,7 @@ export const Input: React.FunctionComponent<InputProps> = ({
 
 interface ControlledInputProps extends InputProps {
   name: string
-  control: Control
+  control: Control<any>
 }
 
 export const ControlledInput: React.FunctionComponent<ControlledInputProps> = ({

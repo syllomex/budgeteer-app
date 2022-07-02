@@ -2,7 +2,8 @@ import React, {
   forwardRef,
   useCallback,
   useImperativeHandle,
-  useRef
+  useRef,
+  useState
 } from 'react'
 import { useForm } from 'react-hook-form'
 import { View } from 'react-native'
@@ -16,38 +17,51 @@ import { ControlledInput } from '../Form/Input'
 import { Spacer } from '../Spacer'
 import { ControlledDateTime } from '../Form/DateTime'
 import { useCreateCategoryExpenditureMutation } from '../../graphql/generated/graphql'
-import { useStore } from '../../contexts/store'
 import { showMessage } from '../../utils'
+import { ControlledSwitch } from '../Form/Switch'
+import { ControlledYearMonth } from '../Form/YearMonth'
+import { T } from '../T'
+import { rem } from '../../config/styles'
 import styles from './styles'
 
 interface ExpenditureFormProps {
   categoryId?: string
+  yearMonth: string
 }
 
 export interface ExpenditureFormHandles {
-  open(): void
+  open(props?: { categoryId?: string }): void
+  close(): void
 }
 
 type FormData = {
   amount: number
   description?: string
   date?: string
+  permanent: boolean
+  permanentUntilYearMonth?: string
+  numberOfInstallments?: number
 }
 
 const schema = yup.object().shape({
   amount: yup.number().required(),
   description: yup.string().nullable(),
-  date: yup.date().nullable()
+  date: yup.date().nullable(),
+  numberOfInstallments: yup.number().nullable()
 })
 
 const ExpenditureFormComponent: React.ForwardRefRenderFunction<
   ExpenditureFormHandles,
   ExpenditureFormProps
-> = ({ categoryId }, ref) => {
+> = ({ categoryId: _categoryId, yearMonth }, ref) => {
   const modalRef = useRef<Modalize>(null)
 
-  const { yearMonth } = useStore()
-  const { control, handleSubmit, reset } = useForm({
+  const [categoryId, setCategoryId] = useState<string | null>(
+    _categoryId ?? null
+  )
+  const [repeat, setRepeat] = useState(false)
+
+  const { control, handleSubmit, reset } = useForm<FormData>({
     resolver: yupResolver(schema)
   })
 
@@ -71,21 +85,47 @@ const ExpenditureFormComponent: React.ForwardRefRenderFunction<
 
   const onSubmit = useCallback(
     async (formData: FormData) => {
+      if (!categoryId && !_categoryId) return
+
       await createExpenditure({
-        variables: { data: { ...formData, categoryId, yearMonth }, yearMonth }
+        variables: {
+          data: {
+            ...formData,
+            categoryId: (categoryId ?? _categoryId) as string,
+            yearMonth,
+            permanentUntilYearMonth: formData.permanent
+              ? formData.permanentUntilYearMonth
+              : null
+          },
+          yearMonth
+        }
       })
+      setRepeat(false)
     },
-    [categoryId, createExpenditure, yearMonth]
+    [_categoryId, categoryId, createExpenditure, yearMonth]
   )
 
-  useImperativeHandle(ref, () => ({ open: () => modalRef.current?.open() }))
+  useImperativeHandle(ref, () => ({
+    open: props => {
+      modalRef.current?.open()
+      if (props?.categoryId) setCategoryId(props.categoryId)
+    },
+    close: () => modalRef.current?.close()
+  }))
 
   return (
     <Modalize
       ref={modalRef}
       adjustToContentHeight
-      scrollViewProps={{ keyboardShouldPersistTaps: 'always' }}
+      scrollViewProps={{
+        keyboardShouldPersistTaps: 'always',
+        showsVerticalScrollIndicator: false
+      }}
       withReactModal
+      onClose={() => {
+        setCategoryId(null)
+        setRepeat(false)
+      }}
     >
       <View style={styles.container}>
         <ControlledInput
@@ -94,24 +134,51 @@ const ExpenditureFormComponent: React.ForwardRefRenderFunction<
           label="Descrição"
           autoFocus
         />
-        <Spacer height={1.8} />
 
         <ControlledInput
           control={control}
           name="amount"
           label="Valor"
           keyboardType="decimal-pad"
+          required
         />
-        <Spacer height={1.8} />
 
         <ControlledDateTime
           control={control}
           name="date"
           label="Data"
           mode="datetime"
+          clearEnabled
         />
 
-        <Spacer height={3} />
+        <ControlledSwitch
+          control={control}
+          name="permanent"
+          label="Repetir"
+          onChange={setRepeat}
+        />
+
+        {repeat && (
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <ControlledYearMonth
+              control={control}
+              name="permanentUntilYearMonth"
+              placeholder="Permanentemente"
+              label="Até"
+              containerStyle={{ flex: 1 }}
+            />
+            <T style={{ paddingHorizontal: rem(1) }}>ou</T>
+            <ControlledInput
+              control={control}
+              name="numberOfInstallments"
+              label="Quantidade de parcelas"
+              keyboardType="decimal-pad"
+              containerStyle={{ flex: 1 }}
+            />
+          </View>
+        )}
+
+        <Spacer height={1.4} />
         <Button loading={loading} onPress={handleSubmit(onSubmit)}>
           Salvar
         </Button>

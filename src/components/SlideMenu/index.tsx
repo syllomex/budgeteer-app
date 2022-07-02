@@ -2,6 +2,7 @@ import React, {
   forwardRef,
   useCallback,
   useImperativeHandle,
+  useMemo,
   useRef
 } from 'react'
 import { TouchableOpacity, View } from 'react-native'
@@ -32,12 +33,13 @@ type Option = {
 export interface SlideMenuProps {
   options?: (Option | false)[]
   shouldAwait?: boolean
+  title?: string
 }
 
 const SlideMenuComponent: React.ForwardRefRenderFunction<
   SlideMenuHandles,
   SlideMenuProps
-> = ({ options, shouldAwait }, ref) => {
+> = ({ options, shouldAwait, title }, ref) => {
   const modalRef = useRef<Modalize>(null)
 
   const handlePress = useCallback(
@@ -84,6 +86,18 @@ const SlideMenuComponent: React.ForwardRefRenderFunction<
     close: () => modalRef.current?.close()
   }))
 
+  const ListHeaderComponent = useMemo(() => {
+    if (!title) return null
+
+    return (
+      <View style={styles.itemContainer}>
+        <T f="bold" s={1.8}>
+          {title}
+        </T>
+      </View>
+    )
+  }, [title])
+
   return (
     <Modalize
       ref={modalRef}
@@ -91,7 +105,8 @@ const SlideMenuComponent: React.ForwardRefRenderFunction<
       flatListProps={{
         data: options,
         keyExtractor: (_item, index) => index.toString(),
-        renderItem
+        renderItem,
+        ListHeaderComponent
       }}
       withReactModal
     />
