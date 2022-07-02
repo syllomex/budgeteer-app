@@ -45,9 +45,9 @@ export const StoreProvider: FunctionComponent = ({ children }) => {
 
   const [month, setMonth] = useState(getCurrentMonth())
 
-  const { user, idToken } = useAuth()
+  const { user, refreshToken } = useAuth()
   const { data, refetch, networkStatus } = useGetMonthlySummaryQuery({
-    skip: !idToken,
+    skip: !refreshToken,
     variables: { yearMonth: month },
     fetchPolicy: 'cache-and-network'
   })

@@ -4,14 +4,14 @@ import { setContext } from '@apollo/client/link/context'
 export const uri = 'https://bdgteer.vercel.app/api/graphql'
 // export const uri = 'http://192.168.0.101:3000/api/graphql'
 
-let googleIdToken: string | null = null
+let googleRefreshToken: string | null = null
 const httpLink = createHttpLink({ uri })
 const authLink = setContext((_, { headers }) => {
   return {
-    headers: googleIdToken
+    headers: googleRefreshToken
       ? {
           ...headers,
-          'google-id-token': googleIdToken
+          'google-refresh-token': googleRefreshToken
         }
       : headers
   }
@@ -25,6 +25,6 @@ export const apollo = new ApolloClient({
   link
 })
 
-export const setAuthorization = (idToken: string) => {
-  googleIdToken = idToken
+export const setAuthorization = (refreshToken: string) => {
+  googleRefreshToken = refreshToken
 }

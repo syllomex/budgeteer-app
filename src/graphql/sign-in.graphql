@@ -1,5 +1,9 @@
-query SignIn($data: SignInWithIdTokenInput!) {
-  signInWithIdToken(data: $data) {
+query SignIn($data: SignInWithRefreshTokenInput!) {
+  signInWithRefreshToken(data: $data) {
     id
   }
+}
+
+query GetGoogleRefreshToken($serverAuthCode: String!) {
+  getGoogleRefreshToken(serverAuthCode: $serverAuthCode)
 }

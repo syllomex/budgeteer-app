@@ -115,8 +115,10 @@ export type Mutation = {
   deleteCategory: Category;
   deleteCategoryExpenditure: CategoryExpenditure;
   deleteMonthlyIncoming: Scalars['Boolean'];
+  getGoogleRefreshToken?: Maybe<Scalars['String']>;
   signIn: User;
   signInWithIdToken: User;
+  signInWithRefreshToken: User;
   updateCategory: Category;
   updateCategoryExpenditure: CategoryExpenditure;
   updateMonthlyIncoming: MonthlyIncoming;
@@ -158,6 +160,11 @@ export type MutationDeleteMonthlyIncomingArgs = {
 };
 
 
+export type MutationGetGoogleRefreshTokenArgs = {
+  serverAuthCode: Scalars['String'];
+};
+
+
 export type MutationSignInArgs = {
   data: SignInInput;
 };
@@ -165,6 +172,11 @@ export type MutationSignInArgs = {
 
 export type MutationSignInWithIdTokenArgs = {
   data: SignInWithIdTokenInput;
+};
+
+
+export type MutationSignInWithRefreshTokenArgs = {
+  data: SignInWithRefreshTokenInput;
 };
 
 
@@ -190,11 +202,13 @@ export type Query = {
   availableBudget: Scalars['Float'];
   categories: Array<Category>;
   category: Category;
+  getGoogleRefreshToken?: Maybe<Scalars['String']>;
   me: User;
   monthlyIncoming: MonthlyIncoming;
   monthlyIncomings: Array<MonthlyIncoming>;
   signIn: User;
   signInWithIdToken: User;
+  signInWithRefreshToken: User;
   totalMonthlyExpenses: Scalars['Float'];
   totalMonthlyIncomings: Scalars['Float'];
 };
@@ -212,6 +226,11 @@ export type QueryCategoriesArgs = {
 
 export type QueryCategoryArgs = {
   id: Scalars['String'];
+};
+
+
+export type QueryGetGoogleRefreshTokenArgs = {
+  serverAuthCode: Scalars['String'];
 };
 
 
@@ -235,6 +254,11 @@ export type QuerySignInWithIdTokenArgs = {
 };
 
 
+export type QuerySignInWithRefreshTokenArgs = {
+  data: SignInWithRefreshTokenInput;
+};
+
+
 export type QueryTotalMonthlyExpensesArgs = {
   filter: MonthlyExpenseInput;
 };
@@ -252,6 +276,11 @@ export type SignInInput = {
 export type SignInWithIdTokenInput = {
   googleId: Scalars['String'];
   idToken: Scalars['String'];
+};
+
+export type SignInWithRefreshTokenInput = {
+  googleId: Scalars['String'];
+  refreshToken: Scalars['String'];
 };
 
 export type UpdateCategoryExpenditureInput = {
@@ -330,11 +359,18 @@ export type GetMonthlySummaryQueryVariables = Exact<{
 export type GetMonthlySummaryQuery = { __typename?: 'Query', totalMonthlyIncomings: number, totalMonthlyExpenses: number, availableBudget: number, categories: Array<{ __typename?: 'Category', id: string, yearMonth: string, name: string, totalExpenses: number }> };
 
 export type SignInQueryVariables = Exact<{
-  data: SignInWithIdTokenInput;
+  data: SignInWithRefreshTokenInput;
 }>;
 
 
-export type SignInQuery = { __typename?: 'Query', signInWithIdToken: { __typename?: 'User', id: string } };
+export type SignInQuery = { __typename?: 'Query', signInWithRefreshToken: { __typename?: 'User', id: string } };
+
+export type GetGoogleRefreshTokenQueryVariables = Exact<{
+  serverAuthCode: Scalars['String'];
+}>;
+
+
+export type GetGoogleRefreshTokenQuery = { __typename?: 'Query', getGoogleRefreshToken?: string | null };
 
 
 export const CreateCategoryExpenditureDocument = gql`
@@ -567,8 +603,8 @@ export type GetMonthlySummaryQueryHookResult = ReturnType<typeof useGetMonthlySu
 export type GetMonthlySummaryLazyQueryHookResult = ReturnType<typeof useGetMonthlySummaryLazyQuery>;
 export type GetMonthlySummaryQueryResult = Apollo.QueryResult<GetMonthlySummaryQuery, GetMonthlySummaryQueryVariables>;
 export const SignInDocument = gql`
-    query SignIn($data: SignInWithIdTokenInput!) {
-  signInWithIdToken(data: $data) {
+    query SignIn($data: SignInWithRefreshTokenInput!) {
+  signInWithRefreshToken(data: $data) {
     id
   }
 }
@@ -601,3 +637,36 @@ export function useSignInLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Sig
 export type SignInQueryHookResult = ReturnType<typeof useSignInQuery>;
 export type SignInLazyQueryHookResult = ReturnType<typeof useSignInLazyQuery>;
 export type SignInQueryResult = Apollo.QueryResult<SignInQuery, SignInQueryVariables>;
+export const GetGoogleRefreshTokenDocument = gql`
+    query GetGoogleRefreshToken($serverAuthCode: String!) {
+  getGoogleRefreshToken(serverAuthCode: $serverAuthCode)
+}
+    `;
+
+/**
+ * __useGetGoogleRefreshTokenQuery__
+ *
+ * To run a query within a React component, call `useGetGoogleRefreshTokenQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetGoogleRefreshTokenQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetGoogleRefreshTokenQuery({
+ *   variables: {
+ *      serverAuthCode: // value for 'serverAuthCode'
+ *   },
+ * });
+ */
+export function useGetGoogleRefreshTokenQuery(baseOptions: Apollo.QueryHookOptions<GetGoogleRefreshTokenQuery, GetGoogleRefreshTokenQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetGoogleRefreshTokenQuery, GetGoogleRefreshTokenQueryVariables>(GetGoogleRefreshTokenDocument, options);
+      }
+export function useGetGoogleRefreshTokenLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetGoogleRefreshTokenQuery, GetGoogleRefreshTokenQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetGoogleRefreshTokenQuery, GetGoogleRefreshTokenQueryVariables>(GetGoogleRefreshTokenDocument, options);
+        }
+export type GetGoogleRefreshTokenQueryHookResult = ReturnType<typeof useGetGoogleRefreshTokenQuery>;
+export type GetGoogleRefreshTokenLazyQueryHookResult = ReturnType<typeof useGetGoogleRefreshTokenLazyQuery>;
+export type GetGoogleRefreshTokenQueryResult = Apollo.QueryResult<GetGoogleRefreshTokenQuery, GetGoogleRefreshTokenQueryVariables>;

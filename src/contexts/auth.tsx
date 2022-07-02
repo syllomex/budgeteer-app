@@ -12,7 +12,12 @@ import { ActivityIndicator, Modal, View } from 'react-native'
 import { SetState } from '../utils/types'
 import { colors } from '../config/styles'
 import { setAuthorization } from '../services/graphql'
-import { useSignInQuery } from '../graphql/generated/graphql'
+import {
+  useGetGoogleRefreshTokenLazyQuery,
+  useSignInQuery
+} from '../graphql/generated/graphql'
+import { showMessage } from '../utils'
+import { useStorage } from '../services/storage'
 
 type User = {
   id: string
@@ -28,31 +33,39 @@ type Nullable<T> = T | null | undefined
 interface AuthContext {
   user: Nullable<User>
   setUser: SetState<Nullable<User>>
-  idToken: Nullable<string>
-  setIdToken: SetState<Nullable<string>>
+  refreshToken: Nullable<string>
+  setRefreshToken: SetState<Nullable<string>>
   initializing: boolean
   setInitializing: SetState<boolean>
   loading: boolean
   setLoading: SetState<boolean>
   currentUser: Nullable<User>
   setCurrentUser: SetState<Nullable<User>>
+  storedToken: Nullable<{ refreshToken: string }>
+  setStoredToken: SetState<Nullable<{ refreshToken: string }>>
 }
 
 const Auth = createContext({} as AuthContext)
 
 export const AuthProvider: FunctionComponent = ({ children }) => {
   const [user, setUser] = useState<Nullable<User>>()
-  const [idToken, setIdToken] = useState<Nullable<string>>()
+  const [refreshToken, setRefreshToken] = useState<Nullable<string>>()
   const [currentUser, setCurrentUser] = useState<Nullable<User>>()
   const [loading, setLoading] = useState(false)
   const [initializing, setInitializing] = useState(true)
-  const [gettingTokens, setGettingTokens] = useState(false)
+
+  const [storedToken, setStoredToken] = useStorage<{
+    refreshToken: string
+  }>('@budgeteer:google-refresh-token')
 
   const { data } = useSignInQuery({
     variables: {
-      data: { googleId: user?.id as string, idToken: idToken as string }
+      data: {
+        googleId: user?.id as string,
+        refreshToken: refreshToken as string
+      }
     },
-    skip: !user?.id || !idToken,
+    skip: !user?.id || !refreshToken,
     onCompleted () {
       setLoading(false)
       setInitializing(false)
@@ -74,36 +87,25 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
   useEffect(() => {}, [])
 
   useEffect(() => {
-    ;(async () => {
-      if (idToken) return
-      if (gettingTokens) return
-      if (!user) return
-
-      setGettingTokens(true)
-      const tokens = await GoogleSignin.getTokens()
-      setIdToken(tokens.idToken)
-      setGettingTokens(false)
-    })()
-  }, [gettingTokens, idToken, user])
-
-  useEffect(() => {
-    if (!idToken) return
-    setAuthorization(idToken)
-  }, [idToken])
+    if (!refreshToken) return
+    setAuthorization(refreshToken)
+  }, [refreshToken])
 
   return (
     <Auth.Provider
       value={{
         user: data ? user : undefined,
         setUser,
-        idToken,
-        setIdToken,
+        refreshToken,
+        setRefreshToken,
         initializing,
         setInitializing,
         loading,
         setLoading,
         currentUser,
-        setCurrentUser
+        setCurrentUser,
+        storedToken,
+        setStoredToken
       }}
     >
       <Modal visible={loading} animationType="fade" transparent>
@@ -131,48 +133,98 @@ export const useAuth = () => {
     setLoading,
     currentUser,
     setCurrentUser,
-    idToken,
-    setIdToken
+    setRefreshToken,
+    refreshToken,
+    storedToken,
+    setStoredToken
   } = useContext(Auth)
+
+  const [getRefreshToken] = useGetGoogleRefreshTokenLazyQuery()
 
   const signIn = useCallback(async () => {
     setLoading(true)
 
     try {
-      const { idToken, user } = await GoogleSignin.signIn()
-      setIdToken(idToken)
+      const showError = () => {
+        showMessage({ message: 'Não foi possível conectar-se.', type: 'error' })
+        setLoading(false)
+        setUser(null)
+      }
+
+      GoogleSignin.configure({
+        webClientId: process.env.GOOGLE_WEB_CLIENT_ID,
+        forceCodeForRefreshToken: !storedToken,
+        offlineAccess: true
+      })
+
+      const { user, serverAuthCode } = await GoogleSignin.signIn()
+
+      if (!serverAuthCode) {
+        return showError()
+      }
+
+      const refreshToken = await (async () => {
+        if (storedToken) {
+          return storedToken.refreshToken
+        }
+
+        const result = await getRefreshToken({
+          variables: { serverAuthCode }
+        })
+
+        const resultToken = result.data?.getGoogleRefreshToken
+        if (resultToken) {
+          setStoredToken({ refreshToken: resultToken })
+        }
+
+        return resultToken
+      })()
+
+      if (!refreshToken) {
+        return showError()
+      }
+
+      setRefreshToken(refreshToken)
       setUser(user)
       // const googleCredential = auth.GoogleAuthProvider.credential(idToken)
       // return auth().signInWithCredential(googleCredential)
     } catch (err) {
       setUser(null)
     }
-  }, [setIdToken, setLoading, setUser])
+  }, [
+    getRefreshToken,
+    setLoading,
+    setRefreshToken,
+    setStoredToken,
+    setUser,
+    storedToken
+  ])
 
   const revokeAndSignIn = useCallback(async () => {
     try {
       setLoading(true)
       setCurrentUser(undefined)
-      setIdToken(null)
+      setRefreshToken(null)
+      setStoredToken(null)
       await GoogleSignin.revokeAccess()
     } catch (err) {
       //
     }
 
     await signIn()
-  }, [setCurrentUser, setIdToken, setLoading, signIn])
+  }, [setCurrentUser, setLoading, setRefreshToken, setStoredToken, signIn])
 
   const signOut = useCallback(() => {
     setUser(null)
-    setIdToken(null)
-  }, [setIdToken, setUser])
+    setRefreshToken(null)
+  }, [setRefreshToken, setUser])
 
   return {
     signIn,
     signOut,
-    user: idToken ? user : undefined,
+    user: refreshToken ? user : undefined,
     currentUser,
     revokeAndSignIn,
-    idToken
+    refreshToken
   }
 }

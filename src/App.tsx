@@ -1,6 +1,5 @@
 import { StatusBar } from 'expo-status-bar'
 import React from 'react'
-import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import { View } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -13,11 +12,6 @@ import { Toast } from './components/Toast'
 import { StoreProvider } from './contexts/store'
 import { useConfigureFonts } from './config/fonts'
 import { apollo } from './services/graphql'
-
-GoogleSignin.configure({
-  webClientId: process.env.GOOGLE_WEB_CLIENT_ID,
-  offlineAccess: true
-})
 
 const AppComponent = () => {
   return (
