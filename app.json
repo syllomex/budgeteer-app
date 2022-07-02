@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "budgeteer-app",
+    "name": "Budgeteer",
     "slug": "budgeteer-app",
     "version": "1.0.0",
     "assetBundlePatterns": ["**/*"],
