@@ -11,10 +11,11 @@ import { Label } from '../Label'
 import formStyles from '../_styles'
 import { colors } from '../../../config/styles'
 
-interface InputProps extends TextInputProps {
+interface InputProps extends Omit<TextInputProps, 'defaultValue'> {
   label?: string
   required?: boolean
   containerStyle?: StyleProp<ViewStyle>
+  defaultValue?: string | number | null
 }
 
 export const Input: React.FunctionComponent<InputProps> = ({
@@ -31,6 +32,7 @@ export const Input: React.FunctionComponent<InputProps> = ({
           {...props}
           style={formStyles.inputText}
           selectionColor={colors['primary-1']}
+          defaultValue={props.defaultValue?.toString()}
         />
       </View>
     </View>
@@ -57,7 +59,7 @@ export const ControlledInput: React.FunctionComponent<ControlledInputProps> = ({
           {...props}
           onChangeText={field.onChange}
           onBlur={field.onBlur}
-          value={field.value}
+          value={field.value?.toString()}
         />
       )}
     />

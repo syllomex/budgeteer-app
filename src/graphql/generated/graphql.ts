@@ -202,6 +202,7 @@ export type Query = {
   availableBudget: Scalars['Float'];
   categories: Array<Category>;
   category: Category;
+  categoryExpenditure: CategoryExpenditure;
   getGoogleRefreshToken?: Maybe<Scalars['String']>;
   me: User;
   monthlyIncoming: MonthlyIncoming;
@@ -225,6 +226,11 @@ export type QueryCategoriesArgs = {
 
 
 export type QueryCategoryArgs = {
+  id: Scalars['String'];
+};
+
+
+export type QueryCategoryExpenditureArgs = {
   id: Scalars['String'];
 };
 
@@ -343,6 +349,13 @@ export type DeleteCategoryMutationVariables = Exact<{
 
 export type DeleteCategoryMutation = { __typename?: 'Mutation', deleteCategory: { __typename?: 'Category', id: string } };
 
+export type GetCategoryExpenditureQueryVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type GetCategoryExpenditureQuery = { __typename?: 'Query', categoryExpenditure: { __typename?: 'CategoryExpenditure', id: string, description?: string | null, amount: number, date?: any | null, numberOfInstallments?: number | null, permanent?: boolean | null, permanentUntilYearMonth?: string | null, category: { __typename?: 'Category', id: string, name: string } } };
+
 export type GetCategoryQueryVariables = Exact<{
   id: Scalars['String'];
   yearMonth: Scalars['String'];
@@ -371,6 +384,15 @@ export type GetGoogleRefreshTokenQueryVariables = Exact<{
 
 
 export type GetGoogleRefreshTokenQuery = { __typename?: 'Query', getGoogleRefreshToken?: string | null };
+
+export type UpdateCategoryExpenditureMutationVariables = Exact<{
+  id: Scalars['String'];
+  data: UpdateCategoryExpenditureInput;
+  yearMonth: Scalars['String'];
+}>;
+
+
+export type UpdateCategoryExpenditureMutation = { __typename?: 'Mutation', updateCategoryExpenditure: { __typename?: 'CategoryExpenditure', id: string, description?: string | null, amount: number, date?: any | null, numberOfInstallments?: number | null, currentInstallment?: number | null } };
 
 
 export const CreateCategoryExpenditureDocument = gql`
@@ -515,6 +537,51 @@ export function useDeleteCategoryMutation(baseOptions?: Apollo.MutationHookOptio
 export type DeleteCategoryMutationHookResult = ReturnType<typeof useDeleteCategoryMutation>;
 export type DeleteCategoryMutationResult = Apollo.MutationResult<DeleteCategoryMutation>;
 export type DeleteCategoryMutationOptions = Apollo.BaseMutationOptions<DeleteCategoryMutation, DeleteCategoryMutationVariables>;
+export const GetCategoryExpenditureDocument = gql`
+    query GetCategoryExpenditure($id: String!) {
+  categoryExpenditure(id: $id) {
+    id
+    description
+    amount
+    date
+    numberOfInstallments
+    permanent
+    permanentUntilYearMonth
+    category {
+      id
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetCategoryExpenditureQuery__
+ *
+ * To run a query within a React component, call `useGetCategoryExpenditureQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCategoryExpenditureQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCategoryExpenditureQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetCategoryExpenditureQuery(baseOptions: Apollo.QueryHookOptions<GetCategoryExpenditureQuery, GetCategoryExpenditureQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetCategoryExpenditureQuery, GetCategoryExpenditureQueryVariables>(GetCategoryExpenditureDocument, options);
+      }
+export function useGetCategoryExpenditureLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCategoryExpenditureQuery, GetCategoryExpenditureQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetCategoryExpenditureQuery, GetCategoryExpenditureQueryVariables>(GetCategoryExpenditureDocument, options);
+        }
+export type GetCategoryExpenditureQueryHookResult = ReturnType<typeof useGetCategoryExpenditureQuery>;
+export type GetCategoryExpenditureLazyQueryHookResult = ReturnType<typeof useGetCategoryExpenditureLazyQuery>;
+export type GetCategoryExpenditureQueryResult = Apollo.QueryResult<GetCategoryExpenditureQuery, GetCategoryExpenditureQueryVariables>;
 export const GetCategoryDocument = gql`
     query GetCategory($id: String!, $yearMonth: String!) {
   category(id: $id) {
@@ -670,3 +737,43 @@ export function useGetGoogleRefreshTokenLazyQuery(baseOptions?: Apollo.LazyQuery
 export type GetGoogleRefreshTokenQueryHookResult = ReturnType<typeof useGetGoogleRefreshTokenQuery>;
 export type GetGoogleRefreshTokenLazyQueryHookResult = ReturnType<typeof useGetGoogleRefreshTokenLazyQuery>;
 export type GetGoogleRefreshTokenQueryResult = Apollo.QueryResult<GetGoogleRefreshTokenQuery, GetGoogleRefreshTokenQueryVariables>;
+export const UpdateCategoryExpenditureDocument = gql`
+    mutation UpdateCategoryExpenditure($id: String!, $data: UpdateCategoryExpenditureInput!, $yearMonth: String!) {
+  updateCategoryExpenditure(id: $id, data: $data) {
+    id
+    description
+    amount
+    date
+    numberOfInstallments
+    currentInstallment(yearMonth: $yearMonth)
+  }
+}
+    `;
+export type UpdateCategoryExpenditureMutationFn = Apollo.MutationFunction<UpdateCategoryExpenditureMutation, UpdateCategoryExpenditureMutationVariables>;
+
+/**
+ * __useUpdateCategoryExpenditureMutation__
+ *
+ * To run a mutation, you first call `useUpdateCategoryExpenditureMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateCategoryExpenditureMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateCategoryExpenditureMutation, { data, loading, error }] = useUpdateCategoryExpenditureMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      data: // value for 'data'
+ *      yearMonth: // value for 'yearMonth'
+ *   },
+ * });
+ */
+export function useUpdateCategoryExpenditureMutation(baseOptions?: Apollo.MutationHookOptions<UpdateCategoryExpenditureMutation, UpdateCategoryExpenditureMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateCategoryExpenditureMutation, UpdateCategoryExpenditureMutationVariables>(UpdateCategoryExpenditureDocument, options);
+      }
+export type UpdateCategoryExpenditureMutationHookResult = ReturnType<typeof useUpdateCategoryExpenditureMutation>;
+export type UpdateCategoryExpenditureMutationResult = Apollo.MutationResult<UpdateCategoryExpenditureMutation>;
+export type UpdateCategoryExpenditureMutationOptions = Apollo.BaseMutationOptions<UpdateCategoryExpenditureMutation, UpdateCategoryExpenditureMutationVariables>;

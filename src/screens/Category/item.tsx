@@ -4,6 +4,7 @@ import { TouchableOpacity, View } from 'react-native'
 import { LoadingOverlay } from '../../components/Loading'
 import { SlideMenu, SlideMenuHandles } from '../../components/SlideMenu'
 import { T } from '../../components/T'
+import { useStore } from '../../contexts/store'
 import {
   GetCategoryQuery,
   useDeleteCategoryExpenditureMutation
@@ -26,7 +27,12 @@ interface ItemProps {
   categoryId: string
 }
 
-export const Item: React.FunctionComponent<ItemProps> = ({ data }) => {
+export const Item: React.FunctionComponent<ItemProps> = ({
+  data,
+  categoryId
+}) => {
+  const { openExpenditureModal } = useStore()
+
   const slideMenu = useRef<SlideMenuHandles>(null)
 
   const [deleteExpenditure, { loading: deleting }] =
@@ -34,6 +40,13 @@ export const Item: React.FunctionComponent<ItemProps> = ({ data }) => {
       variables: { id: data.id },
       refetchQueries: ['GetCategory', 'GetMonthlySummary']
     })
+
+  const handleUpdateExpenditure = useCallback(async () => {
+    openExpenditureModal?.({
+      categoryId,
+      expenditureId: data.id
+    })
+  }, [categoryId, data.id, openExpenditureModal])
 
   const handleDeleteExpenditure = useCallback(async () => {
     const result = await deleteExpenditure()
@@ -64,7 +77,7 @@ export const Item: React.FunctionComponent<ItemProps> = ({ data }) => {
         options={[
           {
             label: 'Editar',
-            onPress: () => {},
+            onPress: handleUpdateExpenditure,
             icon: props => <Feather name="edit" {...props} />
           },
           {

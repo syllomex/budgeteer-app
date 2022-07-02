@@ -23,7 +23,7 @@ type ReturnProps = FormattedReturnProps | RawReturnProps
 
 type DateTimeProps = ReturnProps & {
   label?: string
-  defaultValue?: Date | string
+  defaultValue?: Date | string | null
   value?: Date | string
   mode?: 'date' | 'time' | 'datetime'
   clearEnabled?: boolean

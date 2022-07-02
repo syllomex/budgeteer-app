@@ -1,0 +1,15 @@
+query GetCategoryExpenditure($id: String!) {
+  categoryExpenditure(id: $id) {
+    id
+    description
+    amount
+    date
+    numberOfInstallments
+    permanent
+    permanentUntilYearMonth
+    category {
+      id
+      name
+    }
+  }
+}

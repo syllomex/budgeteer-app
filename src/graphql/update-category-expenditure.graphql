@@ -1,0 +1,14 @@
+mutation UpdateCategoryExpenditure(
+  $id: String!
+  $data: UpdateCategoryExpenditureInput!
+  $yearMonth: String!
+) {
+  updateCategoryExpenditure(id: $id, data: $data) {
+    id
+    description
+    amount
+    date
+    numberOfInstallments
+    currentInstallment(yearMonth: $yearMonth)
+  }
+}

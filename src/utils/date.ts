@@ -26,7 +26,7 @@ export const displayDate = (date: Date, displayFormat = 'P') => {
   return format(date, displayFormat, { locale: ptBR })
 }
 
-export const yearMonthToDate = (yearMonth?: string) => {
+export const yearMonthToDate = (yearMonth?: string | null) => {
   if (!yearMonth) return null
   const [year, month] = yearMonth.split('-').map(v => parseInt(v))
 

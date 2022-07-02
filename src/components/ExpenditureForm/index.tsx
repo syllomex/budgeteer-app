@@ -1,7 +1,9 @@
 import React, {
   forwardRef,
   useCallback,
+  useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState
 } from 'react'
@@ -16,12 +18,17 @@ import { Button } from '../Button'
 import { ControlledInput } from '../Form/Input'
 import { Spacer } from '../Spacer'
 import { ControlledDateTime } from '../Form/DateTime'
-import { useCreateCategoryExpenditureMutation } from '../../graphql/generated/graphql'
-import { showMessage } from '../../utils'
+import {
+  useCreateCategoryExpenditureMutation,
+  useGetCategoryExpenditureQuery,
+  useUpdateCategoryExpenditureMutation
+} from '../../graphql/generated/graphql'
+import { parseDate, showMessage } from '../../utils'
 import { ControlledSwitch } from '../Form/Switch'
 import { ControlledYearMonth } from '../Form/YearMonth'
 import { T } from '../T'
 import { rem } from '../../config/styles'
+import { LoadingIndicator } from '../Loading'
 import styles from './styles'
 
 interface ExpenditureFormProps {
@@ -30,7 +37,7 @@ interface ExpenditureFormProps {
 }
 
 export interface ExpenditureFormHandles {
-  open(props?: { categoryId?: string }): void
+  open(props?: { categoryId?: string; expenditureId?: string }): void
   close(): void
 }
 
@@ -56,6 +63,8 @@ const ExpenditureFormComponent: React.ForwardRefRenderFunction<
 > = ({ categoryId: _categoryId, yearMonth }, ref) => {
   const modalRef = useRef<Modalize>(null)
 
+  const [expenditureId, setExpenditureId] = useState<string>()
+
   const [categoryId, setCategoryId] = useState<string | null>(
     _categoryId ?? null
   )
@@ -65,8 +74,17 @@ const ExpenditureFormComponent: React.ForwardRefRenderFunction<
     resolver: yupResolver(schema)
   })
 
-  const [createExpenditure, { loading }] = useCreateCategoryExpenditureMutation(
-    {
+  const { data } = useGetCategoryExpenditureQuery({
+    variables: { id: expenditureId as string },
+    skip: !expenditureId
+  })
+
+  useEffect(() => {
+    if (data?.categoryExpenditure.permanent) setRepeat(true)
+  }, [data])
+
+  const [createExpenditure, { loading: creating }] =
+    useCreateCategoryExpenditureMutation({
       refetchQueries: ['GetCategory', 'GetMonthlySummary'],
       onCompleted () {
         showMessage({ message: 'Despesa adicionada!' })
@@ -80,35 +98,70 @@ const ExpenditureFormComponent: React.ForwardRefRenderFunction<
           type: 'error'
         })
       }
-    }
-  )
+    })
+
+  const [updateExpenditure, { loading: updating }] =
+    useUpdateCategoryExpenditureMutation({
+      refetchQueries: ['GetCategory', 'GetMonthlySummary'],
+      onCompleted () {
+        showMessage({ message: 'Despesa atualizada!' })
+        modalRef.current?.close()
+        reset()
+      },
+      onError (err) {
+        showMessage({
+          message: 'Não foi possível atualizar a despesa.',
+          description: err.message,
+          type: 'error'
+        })
+      }
+    })
+
+  const loading = useMemo(() => creating || updating, [creating, updating])
 
   const onSubmit = useCallback(
     async (formData: FormData) => {
       if (!categoryId && !_categoryId) return
 
-      await createExpenditure({
-        variables: {
-          data: {
-            ...formData,
-            categoryId: (categoryId ?? _categoryId) as string,
-            yearMonth,
-            permanentUntilYearMonth: formData.permanent
-              ? formData.permanentUntilYearMonth
-              : null
-          },
-          yearMonth
-        }
-      })
+      const data = {
+        ...formData,
+        categoryId: (categoryId ?? _categoryId) as string,
+        permanentUntilYearMonth: formData.permanent
+          ? formData.permanentUntilYearMonth
+          : null
+      }
+
+      if (expenditureId) {
+        await updateExpenditure({
+          variables: { id: expenditureId, data, yearMonth }
+        })
+      } else {
+        await createExpenditure({
+          variables: {
+            data: { ...data, yearMonth },
+            yearMonth
+          }
+        })
+      }
+
+      setExpenditureId(undefined)
       setRepeat(false)
     },
-    [_categoryId, categoryId, createExpenditure, yearMonth]
+    [
+      _categoryId,
+      categoryId,
+      createExpenditure,
+      expenditureId,
+      updateExpenditure,
+      yearMonth
+    ]
   )
 
   useImperativeHandle(ref, () => ({
-    open: props => {
+    open: options => {
       modalRef.current?.open()
-      if (props?.categoryId) setCategoryId(props.categoryId)
+      if (options?.categoryId) setCategoryId(options.categoryId)
+      if (options?.expenditureId) setExpenditureId(options.expenditureId)
     },
     close: () => modalRef.current?.close()
   }))
@@ -128,60 +181,74 @@ const ExpenditureFormComponent: React.ForwardRefRenderFunction<
       }}
     >
       <View style={styles.container}>
-        <ControlledInput
-          control={control}
-          name="description"
-          label="Descrição"
-          autoFocus
-        />
-
-        <ControlledInput
-          control={control}
-          name="amount"
-          label="Valor"
-          keyboardType="decimal-pad"
-          required
-        />
-
-        <ControlledDateTime
-          control={control}
-          name="date"
-          label="Data"
-          mode="datetime"
-          clearEnabled
-        />
-
-        <ControlledSwitch
-          control={control}
-          name="permanent"
-          label="Repetir"
-          onChange={setRepeat}
-        />
-
-        {repeat && (
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <ControlledYearMonth
-              control={control}
-              name="permanentUntilYearMonth"
-              placeholder="Permanentemente"
-              label="Até"
-              containerStyle={{ flex: 1 }}
-            />
-            <T style={{ paddingHorizontal: rem(1) }}>ou</T>
+        {expenditureId && !data ? (
+          <LoadingIndicator />
+        ) : (
+          <>
             <ControlledInput
               control={control}
-              name="numberOfInstallments"
-              label="Quantidade de parcelas"
-              keyboardType="decimal-pad"
-              containerStyle={{ flex: 1 }}
+              name="description"
+              label="Descrição"
+              autoFocus
+              defaultValue={data?.categoryExpenditure.description}
             />
-          </View>
-        )}
 
-        <Spacer height={1.4} />
-        <Button loading={loading} onPress={handleSubmit(onSubmit)}>
-          Salvar
-        </Button>
+            <ControlledInput
+              control={control}
+              name="amount"
+              label="Valor"
+              keyboardType="decimal-pad"
+              required
+              defaultValue={data?.categoryExpenditure.amount}
+            />
+
+            <ControlledDateTime
+              control={control}
+              name="date"
+              label="Data"
+              mode="datetime"
+              clearEnabled
+              defaultValue={parseDate(data?.categoryExpenditure.date)}
+            />
+
+            <ControlledSwitch
+              control={control}
+              name="permanent"
+              label="Repetir"
+              onChange={setRepeat}
+              defaultValue={!!data?.categoryExpenditure.permanent}
+            />
+
+            {repeat && (
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <ControlledYearMonth
+                  control={control}
+                  name="permanentUntilYearMonth"
+                  placeholder="Permanentemente"
+                  label="Até"
+                  containerStyle={{ flex: 1 }}
+                  defaultValue={
+                    data?.categoryExpenditure.permanentUntilYearMonth
+                  }
+                />
+                <T style={{ paddingHorizontal: rem(1) }}>ou</T>
+                <ControlledInput
+                  control={control}
+                  name="numberOfInstallments"
+                  label="Quantidade de parcelas"
+                  keyboardType="decimal-pad"
+                  containerStyle={{ flex: 1 }}
+                  defaultValue={data?.categoryExpenditure.numberOfInstallments}
+                />
+              </View>
+            )}
+
+            <Spacer height={1.4} />
+            <Button loading={loading} onPress={handleSubmit(onSubmit)}>
+              Salvar
+            </Button>
+          </>
+        )}
       </View>
     </Modalize>
   )

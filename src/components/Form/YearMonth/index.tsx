@@ -21,7 +21,7 @@ import { Label } from '../Label'
 import styles from '../_styles'
 
 interface YearMonthPickerProps {
-  defaultValue?: string
+  defaultValue?: string | null
   onSelect?: (yearMonth: string) => void
 }
 
@@ -76,7 +76,7 @@ export const YearMonth: FunctionComponent<YearMonthProps> = ({
 }) => {
   const ref = useRef<YearMonthPickerHandles>(null)
 
-  const [value, setValue] = useState<string | undefined>(defaultValue)
+  const [value, setValue] = useState<string | undefined | null>(defaultValue)
 
   return (
     <View style={containerStyle}>
