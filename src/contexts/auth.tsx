@@ -6,7 +6,6 @@ import React, {
   useEffect,
   useState
 } from 'react'
-import auth from '@react-native-firebase/auth'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import { ActivityIndicator, Modal, View } from 'react-native'
 
@@ -164,8 +163,9 @@ export const useAuth = () => {
   }, [setCurrentUser, setIdToken, setLoading, signIn])
 
   const signOut = useCallback(() => {
-    auth().signOut()
-  }, [])
+    setUser(null)
+    setIdToken(null)
+  }, [setIdToken, setUser])
 
   return {
     signIn,
