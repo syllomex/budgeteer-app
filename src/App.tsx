@@ -12,6 +12,7 @@ import { Toast } from './components/Toast'
 import { StoreProvider } from './contexts/store'
 import { useConfigureFonts } from './config/fonts'
 import { apollo } from './services/graphql'
+import { Confirm } from './components/Confirm'
 
 const AppComponent = () => {
   return (
@@ -19,6 +20,7 @@ const AppComponent = () => {
       <View style={{ flex: 1 }}>
         <RootStack />
         <Toast />
+        <Confirm />
         <StatusBar style="auto" />
       </View>
     </SafeAreaProvider>

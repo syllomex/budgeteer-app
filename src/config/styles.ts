@@ -23,5 +23,9 @@ export const colors = {
   success: '#66AAEE',
   warning: '#FFFF66',
   danger: '#EE6666',
-  'color-overlay': '#00000044'
+  /**
+   * @deprecated
+   */
+  'color-overlay': '#00000044',
+  overlay: '#00000066'
 }
