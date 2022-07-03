@@ -1,6 +1,7 @@
 import { Feather } from '@expo/vector-icons'
 import React, { useCallback, useMemo, useRef } from 'react'
 import { TouchableOpacity, View } from 'react-native'
+import { confirm } from '../../components/Confirm'
 import { LoadingOverlay } from '../../components/Loading'
 import { SlideMenu, SlideMenuHandles } from '../../components/SlideMenu'
 import { T } from '../../components/T'
@@ -49,6 +50,12 @@ export const Item: React.FunctionComponent<ItemProps> = ({
   }, [categoryId, data.id, openExpenditureModal])
 
   const handleDeleteExpenditure = useCallback(async () => {
+    const confirmed = await confirm({
+      title: 'Remover despesa',
+      description: 'Tem certeza de que deseja remover essa despesa?',
+      preset: 'delete'
+    })
+    if (!confirmed) return false
     const result = await deleteExpenditure()
     const success = !!result.data
     if (success) showMessage({ message: 'Despesa removida!' })

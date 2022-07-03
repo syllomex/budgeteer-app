@@ -22,6 +22,7 @@ import {
   ExpenditureForm,
   ExpenditureFormHandles
 } from '../components/ExpenditureForm'
+import { colors } from '../config/styles'
 import { useAuth } from './auth'
 
 const Store = createContext(
@@ -98,6 +99,7 @@ export const StoreProvider: FunctionComponent = ({ children }) => {
         ref={categoryModalRef}
         adjustToContentHeight
         scrollViewProps={{ keyboardShouldPersistTaps: 'always' }}
+        overlayStyle={{ backgroundColor: colors.overlay }}
       >
         <CategoryForm
           yearMonth={month}

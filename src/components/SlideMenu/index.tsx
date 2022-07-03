@@ -102,6 +102,7 @@ const SlideMenuComponent: React.ForwardRefRenderFunction<
     <Modalize
       ref={modalRef}
       adjustToContentHeight
+      overlayStyle={{ backgroundColor: colors.overlay }}
       flatListProps={{
         data: options,
         keyExtractor: (_item, index) => index.toString(),

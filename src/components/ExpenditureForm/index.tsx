@@ -27,7 +27,7 @@ import { getCurrentClosestDateTime, parseDate, showMessage } from '../../utils'
 import { ControlledSwitch } from '../Form/Switch'
 import { ControlledYearMonth } from '../Form/YearMonth'
 import { T } from '../T'
-import { rem } from '../../config/styles'
+import { colors, rem } from '../../config/styles'
 import { LoadingIndicator } from '../Loading'
 import styles from './styles'
 
@@ -177,6 +177,7 @@ const ExpenditureFormComponent: React.ForwardRefRenderFunction<
         keyboardShouldPersistTaps: 'always',
         showsVerticalScrollIndicator: false
       }}
+      overlayStyle={{ backgroundColor: colors.overlay }}
       withReactModal
       onClose={() => {
         setVisible(false)

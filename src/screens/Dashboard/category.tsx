@@ -14,6 +14,7 @@ import {
 } from '../../graphql/generated/graphql'
 import { SlideMenu, SlideMenuHandles } from '../../components/SlideMenu'
 import { LoadingOverlay } from '../../components/Loading'
+import { confirm } from '../../components/Confirm'
 import styles from './category.styles'
 
 interface CategoryProps {
@@ -51,6 +52,12 @@ export const Category: React.FunctionComponent<CategoryProps> = ({ data }) => {
   }
 
   const handleDelete = useCallback(async () => {
+    const confirmed = await confirm({
+      title: 'Remover categoria',
+      description: 'Tem certeza de que deseja remover essa categoria?',
+      preset: 'delete'
+    })
+    if (!confirmed) return false
     await deleteCategory()
     return true
   }, [deleteCategory])
