@@ -68,6 +68,7 @@ const ExpenditureFormComponent: React.ForwardRefRenderFunction<
   const [categoryId, setCategoryId] = useState<string | null>(
     _categoryId ?? null
   )
+  const [visible, setVisible] = useState(false)
   const [repeat, setRepeat] = useState(false)
 
   const { control, handleSubmit, reset } = useForm<FormData>({
@@ -162,6 +163,8 @@ const ExpenditureFormComponent: React.ForwardRefRenderFunction<
       modalRef.current?.open()
       if (options?.categoryId) setCategoryId(options.categoryId)
       if (options?.expenditureId) setExpenditureId(options.expenditureId)
+
+      setVisible(true)
     },
     close: () => modalRef.current?.close()
   }))
@@ -176,12 +179,13 @@ const ExpenditureFormComponent: React.ForwardRefRenderFunction<
       }}
       withReactModal
       onClose={() => {
+        setVisible(false)
         setCategoryId(null)
         setRepeat(false)
       }}
     >
       <View style={styles.container}>
-        {expenditureId && !data ? (
+        {(expenditureId && !data) || !visible ? (
           <LoadingIndicator />
         ) : (
           <>

@@ -349,6 +349,13 @@ export type DeleteCategoryMutationVariables = Exact<{
 
 export type DeleteCategoryMutation = { __typename?: 'Mutation', deleteCategory: { __typename?: 'Category', id: string } };
 
+export type GetCategoryDetailsQueryVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type GetCategoryDetailsQuery = { __typename?: 'Query', category: { __typename?: 'Category', id: string, name: string, totalExpenses: number, yearMonth: string, permanent: boolean, permanentUntilYearMonth?: string | null } };
+
 export type GetCategoryExpenditureQueryVariables = Exact<{
   id: Scalars['String'];
 }>;
@@ -393,6 +400,15 @@ export type UpdateCategoryExpenditureMutationVariables = Exact<{
 
 
 export type UpdateCategoryExpenditureMutation = { __typename?: 'Mutation', updateCategoryExpenditure: { __typename?: 'CategoryExpenditure', id: string, description?: string | null, amount: number, date?: any | null, numberOfInstallments?: number | null, currentInstallment?: number | null } };
+
+export type UpdateCategoryMutationVariables = Exact<{
+  id: Scalars['String'];
+  data: UpdateCategoryInput;
+  yearMonth: Scalars['String'];
+}>;
+
+
+export type UpdateCategoryMutation = { __typename?: 'Mutation', updateCategory: { __typename?: 'Category', id: string, name: string, yearMonth: string, permanent: boolean, permanentUntilYearMonth?: string | null, totalExpenses: number } };
 
 
 export const CreateCategoryExpenditureDocument = gql`
@@ -537,6 +553,46 @@ export function useDeleteCategoryMutation(baseOptions?: Apollo.MutationHookOptio
 export type DeleteCategoryMutationHookResult = ReturnType<typeof useDeleteCategoryMutation>;
 export type DeleteCategoryMutationResult = Apollo.MutationResult<DeleteCategoryMutation>;
 export type DeleteCategoryMutationOptions = Apollo.BaseMutationOptions<DeleteCategoryMutation, DeleteCategoryMutationVariables>;
+export const GetCategoryDetailsDocument = gql`
+    query GetCategoryDetails($id: String!) {
+  category(id: $id) {
+    id
+    name
+    totalExpenses
+    yearMonth
+    permanent
+    permanentUntilYearMonth
+  }
+}
+    `;
+
+/**
+ * __useGetCategoryDetailsQuery__
+ *
+ * To run a query within a React component, call `useGetCategoryDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCategoryDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCategoryDetailsQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetCategoryDetailsQuery(baseOptions: Apollo.QueryHookOptions<GetCategoryDetailsQuery, GetCategoryDetailsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetCategoryDetailsQuery, GetCategoryDetailsQueryVariables>(GetCategoryDetailsDocument, options);
+      }
+export function useGetCategoryDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCategoryDetailsQuery, GetCategoryDetailsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetCategoryDetailsQuery, GetCategoryDetailsQueryVariables>(GetCategoryDetailsDocument, options);
+        }
+export type GetCategoryDetailsQueryHookResult = ReturnType<typeof useGetCategoryDetailsQuery>;
+export type GetCategoryDetailsLazyQueryHookResult = ReturnType<typeof useGetCategoryDetailsLazyQuery>;
+export type GetCategoryDetailsQueryResult = Apollo.QueryResult<GetCategoryDetailsQuery, GetCategoryDetailsQueryVariables>;
 export const GetCategoryExpenditureDocument = gql`
     query GetCategoryExpenditure($id: String!) {
   categoryExpenditure(id: $id) {
@@ -777,3 +833,43 @@ export function useUpdateCategoryExpenditureMutation(baseOptions?: Apollo.Mutati
 export type UpdateCategoryExpenditureMutationHookResult = ReturnType<typeof useUpdateCategoryExpenditureMutation>;
 export type UpdateCategoryExpenditureMutationResult = Apollo.MutationResult<UpdateCategoryExpenditureMutation>;
 export type UpdateCategoryExpenditureMutationOptions = Apollo.BaseMutationOptions<UpdateCategoryExpenditureMutation, UpdateCategoryExpenditureMutationVariables>;
+export const UpdateCategoryDocument = gql`
+    mutation UpdateCategory($id: String!, $data: UpdateCategoryInput!, $yearMonth: String!) {
+  updateCategory(id: $id, data: $data) {
+    id
+    name
+    yearMonth
+    permanent
+    permanentUntilYearMonth
+    totalExpenses(filter: {yearMonth: $yearMonth})
+  }
+}
+    `;
+export type UpdateCategoryMutationFn = Apollo.MutationFunction<UpdateCategoryMutation, UpdateCategoryMutationVariables>;
+
+/**
+ * __useUpdateCategoryMutation__
+ *
+ * To run a mutation, you first call `useUpdateCategoryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateCategoryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateCategoryMutation, { data, loading, error }] = useUpdateCategoryMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      data: // value for 'data'
+ *      yearMonth: // value for 'yearMonth'
+ *   },
+ * });
+ */
+export function useUpdateCategoryMutation(baseOptions?: Apollo.MutationHookOptions<UpdateCategoryMutation, UpdateCategoryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateCategoryMutation, UpdateCategoryMutationVariables>(UpdateCategoryDocument, options);
+      }
+export type UpdateCategoryMutationHookResult = ReturnType<typeof useUpdateCategoryMutation>;
+export type UpdateCategoryMutationResult = Apollo.MutationResult<UpdateCategoryMutation>;
+export type UpdateCategoryMutationOptions = Apollo.BaseMutationOptions<UpdateCategoryMutation, UpdateCategoryMutationVariables>;

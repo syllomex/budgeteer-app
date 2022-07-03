@@ -24,7 +24,7 @@ export const Category: React.FunctionComponent<CategoryProps> = ({ data }) => {
   const slideMenu = useRef<SlideMenuHandles>(null)
 
   const { navigate } = useNavigation<RootStackRouteList>()
-  const { openExpenditureModal } = useStore()
+  const { openExpenditureModal, openCategoryModal } = useStore()
 
   const [deleteCategory, { loading }] = useDeleteCategoryMutation({
     variables: { id: data.id },
@@ -75,6 +75,11 @@ export const Category: React.FunctionComponent<CategoryProps> = ({ data }) => {
             onPress: () => openExpenditureModal?.({ categoryId: data.id })
           },
           {
+            label: 'Editar',
+            icon: props => <Feather name="edit" {...props} />,
+            onPress: () => openCategoryModal({ categoryId: data.id })
+          },
+          {
             label: 'Remover',
             color: 'danger',
             icon: props => <Feather name="trash" {...props} />,
@@ -108,7 +113,7 @@ export const NewCategoryButton: React.FunctionComponent<{
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        onPress={openCategoryModal}
+        onPress={() => openCategoryModal()}
         style={[styles.row, center && { justifyContent: 'center' }]}
       >
         <T c={textColor ?? 'muted'}>Nova categoria</T>

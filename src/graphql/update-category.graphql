@@ -1,0 +1,14 @@
+mutation UpdateCategory(
+  $id: String!
+  $data: UpdateCategoryInput!
+  $yearMonth: String!
+) {
+  updateCategory(id: $id, data: $data) {
+    id
+    name
+    yearMonth
+    permanent
+    permanentUntilYearMonth
+    totalExpenses(filter: { yearMonth: $yearMonth })
+  }
+}

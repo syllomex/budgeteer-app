@@ -28,7 +28,7 @@ const Store = createContext(
   {} as {
     month: string
     setMonth: SetState<string>
-    openCategoryModal(): void
+    openCategoryModal(args?: { categoryId?: string }): void
     closeCategoryModal(): void
     openExpenditureModal?: PropType<ExpenditureFormHandles, 'open'>
     closeExpenditureModal?: PropType<ExpenditureFormHandles, 'close'>
@@ -44,6 +44,7 @@ export const StoreProvider: FunctionComponent = ({ children }) => {
   const expenditureFormRef = useRef<ExpenditureFormHandles>(null)
 
   const [month, setMonth] = useState(getCurrentMonth())
+  const [editingCategoryId, setEditingCategoryId] = useState<string>()
 
   const { user, refreshToken } = useAuth()
   const { data, refetch, networkStatus } = useGetMonthlySummaryQuery({
@@ -52,11 +53,13 @@ export const StoreProvider: FunctionComponent = ({ children }) => {
     fetchPolicy: 'cache-and-network'
   })
 
-  const openCategoryModal = useCallback(() => {
+  const openCategoryModal = useCallback((args?: { categoryId?: string }) => {
+    setEditingCategoryId(args?.categoryId)
     categoryModalRef.current?.open()
   }, [])
 
   const closeCategoryModal = useCallback(() => {
+    setEditingCategoryId(undefined)
     categoryModalRef.current?.close()
   }, [])
 
@@ -99,6 +102,7 @@ export const StoreProvider: FunctionComponent = ({ children }) => {
         <CategoryForm
           yearMonth={month}
           closeCategoryModal={closeCategoryModal}
+          categoryId={editingCategoryId}
         />
       </Modalize>
 
