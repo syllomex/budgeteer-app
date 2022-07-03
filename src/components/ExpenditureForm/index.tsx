@@ -23,7 +23,7 @@ import {
   useGetCategoryExpenditureQuery,
   useUpdateCategoryExpenditureMutation
 } from '../../graphql/generated/graphql'
-import { parseDate, showMessage } from '../../utils'
+import { getCurrentClosestDateTime, parseDate, showMessage } from '../../utils'
 import { ControlledSwitch } from '../Form/Switch'
 import { ControlledYearMonth } from '../Form/YearMonth'
 import { T } from '../T'
@@ -212,7 +212,10 @@ const ExpenditureFormComponent: React.ForwardRefRenderFunction<
               label="Data"
               mode="datetime"
               clearEnabled
-              defaultValue={parseDate(data?.categoryExpenditure.date)}
+              defaultValue={
+                parseDate(data?.categoryExpenditure.date) ||
+                getCurrentClosestDateTime()
+              }
             />
 
             <ControlledSwitch

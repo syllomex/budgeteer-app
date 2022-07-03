@@ -1,5 +1,6 @@
 import { format, parse, parseISO } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { closest } from './number'
 
 export const parseDate = (
   date?: string,
@@ -39,4 +40,10 @@ export const yearMonthToDate = (yearMonth?: string | null) => {
 
 export const dateToYearMonth = (date: Date) => {
   return format(date, 'yyyy-MM', { locale: ptBR })
+}
+
+export const getCurrentClosestDateTime = () => {
+  return new Date(
+    new Date().setMinutes(closest(new Date().getMinutes(), [0, 15, 30, 45]))
+  )
 }
