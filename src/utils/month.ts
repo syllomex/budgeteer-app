@@ -19,7 +19,7 @@ export const getDateByMonth = (yearMonth: string) => {
 
 export const displayYearMonth = (yearMonth: string) => {
   const date = parse(yearMonth, 'yyyy-MM', new Date(), { locale: ptBR })
-  return `${capitalize(format(date, 'MMMM', { locale: ptBR }))} - ${format(
+  return `${capitalize(format(date, 'MMMM', { locale: ptBR }))}/${format(
     date,
     'yyyy'
   )}`
