@@ -13,6 +13,7 @@ import { StoreProvider } from './contexts/store'
 import { useConfigureFonts } from './config/fonts'
 import { apollo } from './services/graphql'
 import { Confirm } from './components/Confirm'
+import { useUpdates } from './services/updates'
 
 const AppComponent = () => {
   return (
@@ -29,8 +30,9 @@ const AppComponent = () => {
 
 export default function App () {
   const { fontsLoaded } = useConfigureFonts()
+  const { isDone } = useUpdates()
 
-  if (!fontsLoaded) return <AppLoading />
+  if (!fontsLoaded || !isDone) return <AppLoading />
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
