@@ -2,7 +2,7 @@ import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 
 export const uri = 'https://bdgteer.vercel.app/api/graphql'
-// export const uri = 'http://192.168.0.101:3000/api/graphql'
+// export const uri = 'http://192.168.0.200:3000/api/graphql'
 
 let googleRefreshToken: string | null = null
 const httpLink = createHttpLink({ uri })

@@ -9,6 +9,7 @@ import {
   useGetCategoryDetailsQuery,
   useUpdateCategoryMutation
 } from '../../graphql/generated/graphql'
+import { displayYearMonth } from '../../utils'
 import { showMessage } from '../../utils/message'
 import { ControlledSwitch } from '../Form/Switch'
 import { ControlledYearMonth } from '../Form/YearMonth'
@@ -84,7 +85,7 @@ export const CategoryForm: React.FunctionComponent<CategoryFormProps> = ({
               permanentUntilYearMonth: formData.permanent
                 ? formData.permanentUntilYearMonth
                 : null,
-              yearMonth
+              yearMonth: formData.yearMonth ?? yearMonth
             },
             yearMonth
           }
@@ -98,7 +99,8 @@ export const CategoryForm: React.FunctionComponent<CategoryFormProps> = ({
               permanent: formData.permanent,
               permanentUntilYearMonth: formData.permanent
                 ? formData.permanentUntilYearMonth
-                : null
+                : null,
+              yearMonth: formData.yearMonth ?? yearMonth
             },
             yearMonth
           }
@@ -138,13 +140,23 @@ export const CategoryForm: React.FunctionComponent<CategoryFormProps> = ({
       />
 
       {repeat && (
-        <ControlledYearMonth
-          control={control}
-          name="permanentUntilYearMonth"
-          placeholder="Permanentemente"
-          label="Até"
-          defaultValue={data?.category.permanentUntilYearMonth}
-        />
+        <>
+          <ControlledYearMonth
+            control={control}
+            name="yearMonth"
+            placeholder={displayYearMonth(yearMonth)}
+            label="Mês inicial"
+            defaultValue={data?.category.yearMonth ?? yearMonth}
+          />
+
+          <ControlledYearMonth
+            control={control}
+            name="permanentUntilYearMonth"
+            placeholder="Permanentemente"
+            label="Até"
+            defaultValue={data?.category.permanentUntilYearMonth}
+          />
+        </>
       )}
 
       <Spacer height={1.4} />

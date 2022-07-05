@@ -28,7 +28,8 @@ export const Category: React.FunctionComponent = () => {
   const { yearMonth } = useStore()
 
   const { data, refetch, networkStatus } = useGetCategoryQuery({
-    variables: { id: params.category.id, yearMonth }
+    variables: { id: params.category.id, yearMonth },
+    fetchPolicy: 'cache-and-network'
   })
 
   return (

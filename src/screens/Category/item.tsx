@@ -32,7 +32,7 @@ export const Item: React.FunctionComponent<ItemProps> = ({
   data,
   categoryId
 }) => {
-  const { openExpenditureModal } = useStore()
+  const { openExpenditureModal, openExpenditureMonthlyModal } = useStore()
 
   const slideMenu = useRef<SlideMenuHandles>(null)
 
@@ -48,6 +48,10 @@ export const Item: React.FunctionComponent<ItemProps> = ({
       expenditureId: data.id
     })
   }, [categoryId, data.id, openExpenditureModal])
+
+  const handleUpdateInMonth = useCallback(async () => {
+    openExpenditureMonthlyModal?.({ expenditureId: data.id })
+  }, [data.id, openExpenditureMonthlyModal])
 
   const handleDeleteExpenditure = useCallback(async () => {
     const confirmed = await confirm({
@@ -88,6 +92,11 @@ export const Item: React.FunctionComponent<ItemProps> = ({
             icon: props => <Feather name="edit" {...props} />
           },
           {
+            label: 'Editar valor no mês atual',
+            onPress: handleUpdateInMonth,
+            icon: props => <Feather name="calendar" {...props} />
+          },
+          {
             label: 'Remover',
             onPress: handleDeleteExpenditure,
             color: 'danger',
@@ -101,7 +110,7 @@ export const Item: React.FunctionComponent<ItemProps> = ({
           {parseAndDisplay(data.date, { displayFormat: 'Pp' })}
         </T>
         <T f="medium" s={1.6} c="primary">
-          {monetize(data.amount)}
+          {monetize(data.monthly?.amount ?? data.amount)}
         </T>
       </View>
       <T f={data.description ? 'regular' : 'italic'}>

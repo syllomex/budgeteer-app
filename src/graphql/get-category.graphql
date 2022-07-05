@@ -10,6 +10,10 @@ query GetCategory($id: String!, $yearMonth: String!) {
       date
       numberOfInstallments
       currentInstallment(yearMonth: $yearMonth)
+      monthly(yearMonth: $yearMonth) {
+        id
+        amount
+      }
     }
   }
 }

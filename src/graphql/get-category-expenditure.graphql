@@ -1,4 +1,4 @@
-query GetCategoryExpenditure($id: String!) {
+query GetCategoryExpenditure($id: String!, $yearMonth: String!) {
   categoryExpenditure(id: $id) {
     id
     description
@@ -10,6 +10,10 @@ query GetCategoryExpenditure($id: String!) {
     category {
       id
       name
+    }
+    monthly(yearMonth: $yearMonth) {
+      id
+      amount
     }
   }
 }

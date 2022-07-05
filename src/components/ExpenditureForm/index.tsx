@@ -76,12 +76,13 @@ const ExpenditureFormComponent: React.ForwardRefRenderFunction<
   })
 
   const { data } = useGetCategoryExpenditureQuery({
-    variables: { id: expenditureId as string },
-    skip: !expenditureId
+    variables: { id: expenditureId as string, yearMonth },
+    skip: !expenditureId,
+    fetchPolicy: 'network-only'
   })
 
   useEffect(() => {
-    if (data?.categoryExpenditure.permanent) setRepeat(true)
+    if (data?.categoryExpenditure) setRepeat(true)
   }, [data])
 
   const [createExpenditure, { loading: creating }] =
@@ -183,6 +184,7 @@ const ExpenditureFormComponent: React.ForwardRefRenderFunction<
         setVisible(false)
         setCategoryId(null)
         setRepeat(false)
+        setExpenditureId(undefined)
       }}
     >
       <View style={styles.container}>

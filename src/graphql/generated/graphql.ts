@@ -49,6 +49,8 @@ export type CategoryExpenditure = {
   date?: Maybe<Scalars['DateTime']>;
   description?: Maybe<Scalars['String']>;
   id: Scalars['String'];
+  monthly?: Maybe<MonthlyCategoryExpenditure>;
+  months?: Maybe<Array<MonthlyCategoryExpenditure>>;
   numberOfInstallments?: Maybe<Scalars['Int']>;
   permanent?: Maybe<Scalars['Boolean']>;
   permanentUntilYearMonth?: Maybe<Scalars['String']>;
@@ -57,6 +59,11 @@ export type CategoryExpenditure = {
 
 
 export type CategoryExpenditureCurrentInstallmentArgs = {
+  yearMonth: Scalars['String'];
+};
+
+
+export type CategoryExpenditureMonthlyArgs = {
   yearMonth: Scalars['String'];
 };
 
@@ -88,9 +95,21 @@ export type CreateMonthlyIncomingInput = {
   startYearMonth: Scalars['String'];
 };
 
+export type CreateOrUpdateMonthlyCategoryExpenditureInput = {
+  amount: Scalars['Float'];
+};
+
 export type CreateUserInput = {
   googleId: Scalars['String'];
   refreshToken: Scalars['String'];
+};
+
+export type MonthlyCategoryExpenditure = {
+  __typename?: 'MonthlyCategoryExpenditure';
+  amount: Scalars['Float'];
+  createdAt: Scalars['DateTime'];
+  id: Scalars['String'];
+  yearMonth: Scalars['String'];
 };
 
 export type MonthlyExpenseInput = {
@@ -114,6 +133,7 @@ export type Mutation = {
   createUser: User;
   deleteCategory: Category;
   deleteCategoryExpenditure: CategoryExpenditure;
+  deleteMonthlyCategoryExpenditure: CategoryExpenditure;
   deleteMonthlyIncoming: Scalars['Boolean'];
   getGoogleRefreshToken?: Maybe<Scalars['String']>;
   signIn: User;
@@ -121,6 +141,7 @@ export type Mutation = {
   signInWithRefreshToken: User;
   updateCategory: Category;
   updateCategoryExpenditure: CategoryExpenditure;
+  updateCategoryExpenditureInMonth: CategoryExpenditure;
   updateMonthlyIncoming: MonthlyIncoming;
 };
 
@@ -152,6 +173,12 @@ export type MutationDeleteCategoryArgs = {
 
 export type MutationDeleteCategoryExpenditureArgs = {
   id: Scalars['String'];
+};
+
+
+export type MutationDeleteMonthlyCategoryExpenditureArgs = {
+  expenditureId: Scalars['String'];
+  yearMonth: Scalars['String'];
 };
 
 
@@ -189,6 +216,13 @@ export type MutationUpdateCategoryArgs = {
 export type MutationUpdateCategoryExpenditureArgs = {
   data: UpdateCategoryExpenditureInput;
   id: Scalars['String'];
+};
+
+
+export type MutationUpdateCategoryExpenditureInMonthArgs = {
+  data: CreateOrUpdateMonthlyCategoryExpenditureInput;
+  id: Scalars['String'];
+  yearMonth: Scalars['String'];
 };
 
 
@@ -358,10 +392,11 @@ export type GetCategoryDetailsQuery = { __typename?: 'Query', category: { __type
 
 export type GetCategoryExpenditureQueryVariables = Exact<{
   id: Scalars['String'];
+  yearMonth: Scalars['String'];
 }>;
 
 
-export type GetCategoryExpenditureQuery = { __typename?: 'Query', categoryExpenditure: { __typename?: 'CategoryExpenditure', id: string, description?: string | null, amount: number, date?: any | null, numberOfInstallments?: number | null, permanent?: boolean | null, permanentUntilYearMonth?: string | null, category: { __typename?: 'Category', id: string, name: string } } };
+export type GetCategoryExpenditureQuery = { __typename?: 'Query', categoryExpenditure: { __typename?: 'CategoryExpenditure', id: string, description?: string | null, amount: number, date?: any | null, numberOfInstallments?: number | null, permanent?: boolean | null, permanentUntilYearMonth?: string | null, category: { __typename?: 'Category', id: string, name: string }, monthly?: { __typename?: 'MonthlyCategoryExpenditure', id: string, amount: number } | null } };
 
 export type GetCategoryQueryVariables = Exact<{
   id: Scalars['String'];
@@ -369,7 +404,7 @@ export type GetCategoryQueryVariables = Exact<{
 }>;
 
 
-export type GetCategoryQuery = { __typename?: 'Query', category: { __typename?: 'Category', id: string, name: string, totalExpenses: number, expenditures: Array<{ __typename?: 'CategoryExpenditure', id: string, description?: string | null, amount: number, date?: any | null, numberOfInstallments?: number | null, currentInstallment?: number | null }> } };
+export type GetCategoryQuery = { __typename?: 'Query', category: { __typename?: 'Category', id: string, name: string, totalExpenses: number, expenditures: Array<{ __typename?: 'CategoryExpenditure', id: string, description?: string | null, amount: number, date?: any | null, numberOfInstallments?: number | null, currentInstallment?: number | null, monthly?: { __typename?: 'MonthlyCategoryExpenditure', id: string, amount: number } | null }> } };
 
 export type GetMonthlySummaryQueryVariables = Exact<{
   yearMonth: Scalars['String'];
@@ -391,6 +426,15 @@ export type GetGoogleRefreshTokenQueryVariables = Exact<{
 
 
 export type GetGoogleRefreshTokenQuery = { __typename?: 'Query', getGoogleRefreshToken?: string | null };
+
+export type UpdateCategoryExpenditureInMonthMutationVariables = Exact<{
+  id: Scalars['String'];
+  yearMonth: Scalars['String'];
+  data: CreateOrUpdateMonthlyCategoryExpenditureInput;
+}>;
+
+
+export type UpdateCategoryExpenditureInMonthMutation = { __typename?: 'Mutation', updateCategoryExpenditureInMonth: { __typename?: 'CategoryExpenditure', id: string, description?: string | null, amount: number, date?: any | null, numberOfInstallments?: number | null, currentInstallment?: number | null, monthly?: { __typename?: 'MonthlyCategoryExpenditure', id: string, amount: number } | null } };
 
 export type UpdateCategoryExpenditureMutationVariables = Exact<{
   id: Scalars['String'];
@@ -594,7 +638,7 @@ export type GetCategoryDetailsQueryHookResult = ReturnType<typeof useGetCategory
 export type GetCategoryDetailsLazyQueryHookResult = ReturnType<typeof useGetCategoryDetailsLazyQuery>;
 export type GetCategoryDetailsQueryResult = Apollo.QueryResult<GetCategoryDetailsQuery, GetCategoryDetailsQueryVariables>;
 export const GetCategoryExpenditureDocument = gql`
-    query GetCategoryExpenditure($id: String!) {
+    query GetCategoryExpenditure($id: String!, $yearMonth: String!) {
   categoryExpenditure(id: $id) {
     id
     description
@@ -606,6 +650,10 @@ export const GetCategoryExpenditureDocument = gql`
     category {
       id
       name
+    }
+    monthly(yearMonth: $yearMonth) {
+      id
+      amount
     }
   }
 }
@@ -624,6 +672,7 @@ export const GetCategoryExpenditureDocument = gql`
  * const { data, loading, error } = useGetCategoryExpenditureQuery({
  *   variables: {
  *      id: // value for 'id'
+ *      yearMonth: // value for 'yearMonth'
  *   },
  * });
  */
@@ -651,6 +700,10 @@ export const GetCategoryDocument = gql`
       date
       numberOfInstallments
       currentInstallment(yearMonth: $yearMonth)
+      monthly(yearMonth: $yearMonth) {
+        id
+        amount
+      }
     }
   }
 }
@@ -793,6 +846,50 @@ export function useGetGoogleRefreshTokenLazyQuery(baseOptions?: Apollo.LazyQuery
 export type GetGoogleRefreshTokenQueryHookResult = ReturnType<typeof useGetGoogleRefreshTokenQuery>;
 export type GetGoogleRefreshTokenLazyQueryHookResult = ReturnType<typeof useGetGoogleRefreshTokenLazyQuery>;
 export type GetGoogleRefreshTokenQueryResult = Apollo.QueryResult<GetGoogleRefreshTokenQuery, GetGoogleRefreshTokenQueryVariables>;
+export const UpdateCategoryExpenditureInMonthDocument = gql`
+    mutation UpdateCategoryExpenditureInMonth($id: String!, $yearMonth: String!, $data: CreateOrUpdateMonthlyCategoryExpenditureInput!) {
+  updateCategoryExpenditureInMonth(id: $id, data: $data, yearMonth: $yearMonth) {
+    id
+    description
+    amount
+    monthly(yearMonth: $yearMonth) {
+      id
+      amount
+    }
+    date
+    numberOfInstallments
+    currentInstallment(yearMonth: $yearMonth)
+  }
+}
+    `;
+export type UpdateCategoryExpenditureInMonthMutationFn = Apollo.MutationFunction<UpdateCategoryExpenditureInMonthMutation, UpdateCategoryExpenditureInMonthMutationVariables>;
+
+/**
+ * __useUpdateCategoryExpenditureInMonthMutation__
+ *
+ * To run a mutation, you first call `useUpdateCategoryExpenditureInMonthMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateCategoryExpenditureInMonthMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateCategoryExpenditureInMonthMutation, { data, loading, error }] = useUpdateCategoryExpenditureInMonthMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      yearMonth: // value for 'yearMonth'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useUpdateCategoryExpenditureInMonthMutation(baseOptions?: Apollo.MutationHookOptions<UpdateCategoryExpenditureInMonthMutation, UpdateCategoryExpenditureInMonthMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateCategoryExpenditureInMonthMutation, UpdateCategoryExpenditureInMonthMutationVariables>(UpdateCategoryExpenditureInMonthDocument, options);
+      }
+export type UpdateCategoryExpenditureInMonthMutationHookResult = ReturnType<typeof useUpdateCategoryExpenditureInMonthMutation>;
+export type UpdateCategoryExpenditureInMonthMutationResult = Apollo.MutationResult<UpdateCategoryExpenditureInMonthMutation>;
+export type UpdateCategoryExpenditureInMonthMutationOptions = Apollo.BaseMutationOptions<UpdateCategoryExpenditureInMonthMutation, UpdateCategoryExpenditureInMonthMutationVariables>;
 export const UpdateCategoryExpenditureDocument = gql`
     mutation UpdateCategoryExpenditure($id: String!, $data: UpdateCategoryExpenditureInput!, $yearMonth: String!) {
   updateCategoryExpenditure(id: $id, data: $data) {

@@ -23,6 +23,10 @@ import {
   ExpenditureFormHandles
 } from '../components/ExpenditureForm'
 import { colors } from '../config/styles'
+import {
+  MonthlyExpenditureForm,
+  MonthlyExpenditureFormHandles
+} from '../components/ExpenditureMonthlyForm'
 import { useAuth } from './auth'
 
 const Store = createContext(
@@ -33,6 +37,8 @@ const Store = createContext(
     closeCategoryModal(): void
     openExpenditureModal?: PropType<ExpenditureFormHandles, 'open'>
     closeExpenditureModal?: PropType<ExpenditureFormHandles, 'close'>
+    openExpenditureMonthlyModal?: PropType<MonthlyExpenditureFormHandles, 'open'>
+    closeExpenditureMonthlyModal?: PropType<MonthlyExpenditureFormHandles, 'close'>
     data: GetMonthlySummaryQuery | undefined
     refetch(): Promise<GetMonthlySummaryQuery>
     refreshing: boolean
@@ -43,6 +49,7 @@ const Store = createContext(
 export const StoreProvider: FunctionComponent = ({ children }) => {
   const categoryModalRef = useRef<Modalize>(null)
   const expenditureFormRef = useRef<ExpenditureFormHandles>(null)
+  const monthlyExpenditureFormRef = useRef<ExpenditureFormHandles>(null)
 
   const [month, setMonth] = useState(getCurrentMonth())
   const [editingCategoryId, setEditingCategoryId] = useState<string>()
@@ -72,6 +79,14 @@ export const StoreProvider: FunctionComponent = ({ children }) => {
     expenditureFormRef.current?.close()
   }, [])
 
+  const openExpenditureMonthlyModal = useCallback(props => {
+    monthlyExpenditureFormRef.current?.open(props)
+  }, [])
+
+  const closeExpenditureMonthlyModal = useCallback(() => {
+    monthlyExpenditureFormRef.current?.close()
+  }, [])
+
   useEffect(() => {
     if (!user) setMonth(getCurrentMonth())
   }, [user])
@@ -85,6 +100,8 @@ export const StoreProvider: FunctionComponent = ({ children }) => {
         closeCategoryModal,
         openExpenditureModal,
         closeExpenditureModal,
+        openExpenditureMonthlyModal,
+        closeExpenditureMonthlyModal,
         data,
         refetch: async () => {
           return (await refetch()).data
@@ -109,6 +126,10 @@ export const StoreProvider: FunctionComponent = ({ children }) => {
       </Modalize>
 
       <ExpenditureForm ref={expenditureFormRef} yearMonth={month} />
+      <MonthlyExpenditureForm
+        ref={monthlyExpenditureFormRef}
+        yearMonth={month}
+      />
     </Store.Provider>
   )
 }
