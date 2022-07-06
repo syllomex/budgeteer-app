@@ -7,14 +7,28 @@ export const useUpdates = () => {
   const [isDone, setDone] = useState(false)
 
   useEffect(() => {
+    if (isDone) return
+
+    const timeout = setTimeout(() => {
+      setDone(true)
+    }, 1000 * 30) // 30 seconds
+
+    return () => clearTimeout(timeout)
+  }, [isDone])
+
+  useEffect(() => {
     ;(async () => {
-      if (__DEV__) return setDone(true)
+      try {
+        if (__DEV__) return setDone(true)
 
-      const result = await Updates.checkForUpdateAsync()
-      if (!result.isAvailable) return setDone(true)
+        const result = await Updates.checkForUpdateAsync()
+        if (!result.isAvailable) return setDone(true)
 
-      await Updates.fetchUpdateAsync()
-      Updates.reloadAsync()
+        await Updates.fetchUpdateAsync()
+        Updates.reloadAsync()
+      } catch (err) {
+        setDone(true)
+      }
     })()
   }, [])
 
