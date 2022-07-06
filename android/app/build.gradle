@@ -2,6 +2,7 @@ apply plugin: "com.android.application"
 apply plugin: "com.google.gms.google-services"
 
 import com.android.build.OutputFile
+import groovy.json.JsonSlurper
 
 /**
  * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
@@ -123,6 +124,7 @@ def jscFlavor = 'org.webkit:android-jsc:+'
  * and the benefits of using Hermes will therefore be sharply reduced.
  */
 def enableHermes = project.ext.react.get("enableHermes", false);
+def version = new JsonSlurper().parseText(new File("$rootDir/../version.json").text);
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -136,8 +138,8 @@ android {
         applicationId "com.budgeteerapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "0.1.0"
+        versionCode version.android.versionCode // 1
+        versionName version.android.versionName // "0.1.0"
     }
     splits {
         abi {
