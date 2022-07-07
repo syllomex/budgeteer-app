@@ -77,7 +77,7 @@ const MonthlyIncomingFormComponent: React.ForwardRefRenderFunction<
 
   const [updateIncoming, { loading: updating }] =
     useUpdateMonthlyIncomingMutation({
-      refetchQueries: ['GetMonthlySummary'],
+      refetchQueries: ['GetMonthlySummary', 'GetAvailableBudget'],
       onCompleted () {
         showMessage({ message: 'Renda atualizada!' })
         modalRef.current?.close()
@@ -85,7 +85,7 @@ const MonthlyIncomingFormComponent: React.ForwardRefRenderFunction<
       },
       onError (err) {
         showMessage({
-          message: 'Não foi possível atualizar a renda.',
+          message: 'Não foi possível atualizar o rendimento.',
           description: err.message,
           type: 'error'
         })
@@ -94,15 +94,19 @@ const MonthlyIncomingFormComponent: React.ForwardRefRenderFunction<
 
   const [createIncoming, { loading: creating }] =
     useCreateMonthlyIncomingMutation({
-      refetchQueries: ['GetMonthlySummary'],
+      refetchQueries: [
+        'GetMonthlySummary',
+        'GetAvailableBudget',
+        'GetMonthlyIncomings'
+      ],
       onCompleted () {
-        showMessage({ message: 'Renda adicionada!' })
+        showMessage({ message: 'Rendimento adicionado!' })
         modalRef.current?.close()
         reset()
       },
       onError (err) {
         showMessage({
-          message: 'Não foi possível adicionar a renda.',
+          message: 'Não foi possível adicionar o rendimento.',
           description: err.message,
           type: 'error'
         })
@@ -171,19 +175,19 @@ const MonthlyIncomingFormComponent: React.ForwardRefRenderFunction<
 
             <ControlledInput
               control={control}
+              name="description"
+              label="Descrição"
+              placeholder="Ex: Salário"
+              defaultValue={data?.monthlyIncoming.description}
+            />
+
+            <ControlledInput
+              control={control}
               name="amount"
               label="Valor"
               keyboardType="decimal-pad"
               required
               defaultValue={data?.monthlyIncoming.amount}
-            />
-
-            <ControlledInput
-              control={control}
-              name="description"
-              label="Descrição"
-              placeholder="Ex: Salário"
-              defaultValue={data?.monthlyIncoming.description}
             />
 
             <Switch label="Renda fixa" onChange={setRepeat} value={repeat} />
