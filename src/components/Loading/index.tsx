@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { ActivityIndicator, Modal, View } from 'react-native'
-import { colors } from '../../config/styles'
+import { colors, rem } from '../../config/styles'
 
 export const useLoadingText = ({
   enabled,
@@ -28,11 +28,19 @@ export const useLoadingText = ({
 }
 
 export const LoadingIndicator = ({
-  size = 'large'
+  size = 'large',
+  spaced
 }: {
   size?: 'large' | 'small'
+  spaced?: boolean
 }) => {
-  return <ActivityIndicator size={size} color={colors.primary} />
+  return (
+    <ActivityIndicator
+      size={size}
+      color={colors.primary}
+      style={[spaced && { marginVertical: rem(3) }]}
+    />
+  )
 }
 
 export const LoadingOverlay = ({ visible }: { visible: boolean }) => {

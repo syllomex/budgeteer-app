@@ -146,16 +146,16 @@ export const Item: React.FunctionComponent<ItemProps> = ({
         />
 
         <View style={styles.row}>
-          <T style={{ flex: 1 }} c="muted">
-            {parseAndDisplay(data.date, { displayFormat: 'Pp' })}
+          <T style={{ flex: 1 }} f={data.description ? 'regular' : 'italic'}>
+            {data.description ? data.description : 'Sem descrição'}
+            {installments}
           </T>
           <T f="medium" s={1.6} c="primary">
             {monetize(data.monthly?.amount ?? data.amount)}
           </T>
         </View>
-        <T f={data.description ? 'regular' : 'italic'}>
-          {data.description ? data.description : 'Sem descrição'}
-          {installments}
+        <T c="muted" size={1.2}>
+          {parseAndDisplay(data.date, { displayFormat: 'Pp' })}
         </T>
       </View>
     </TouchableOpacity>

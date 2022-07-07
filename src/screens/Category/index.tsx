@@ -34,7 +34,7 @@ export const Category: React.FunctionComponent = () => {
   })
 
   const ListEmptyComponent = useMemo(() => {
-    if (!data) return <LoadingIndicator />
+    if (!data) return <LoadingIndicator spaced />
 
     if (data?.category.expenditures.length === 0) {
       return <NoContent visible>Nenhuma despesa nessa categoria</NoContent>
