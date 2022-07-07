@@ -81,7 +81,12 @@ export const AuthenticatedDrawer = () => {
         drawerActiveBackgroundColor: 'transparent',
         drawerItemStyle: { borderRadius: 0, marginHorizontal: 0 },
         drawerType: 'back',
-        headerRight: () => <HeaderRight />
+        headerRight: () => <HeaderRight />,
+        headerStyle: {
+          borderBottomWidth: 1,
+          elevation: 0,
+          borderBottomColor: colors['background-matte']
+        }
       }}
       drawerContent={props => <CustomDrawerContent {...props} />}
     >

@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React from 'react'
-import { colors } from '../config/styles'
+import { renderCustomStackHeader } from '../components/CustomStackHeader'
 import { useAuth } from '../contexts/auth'
 import { Category } from '../screens/Category'
 import { AnonymousStack } from './AnonymousStack'
@@ -18,11 +18,7 @@ export const RootStack = () => {
         initialRouteName="AuthenticatedDrawer"
         screenOptions={{
           animation: 'slide_from_right',
-          headerTitleStyle: {
-            fontFamily: 'semiBold',
-            color: colors['text-neutral']
-          },
-          headerShadowVisible: false
+          header: renderCustomStackHeader
         }}
       >
         <Screen
