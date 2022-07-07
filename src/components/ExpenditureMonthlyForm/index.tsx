@@ -1,9 +1,7 @@
 import React, {
   forwardRef,
   useCallback,
-  useEffect,
   useImperativeHandle,
-  useMemo,
   useRef,
   useState
 } from 'react'
@@ -17,18 +15,12 @@ import { Modalize } from 'react-native-modalize'
 import { Button } from '../Button'
 import { ControlledInput } from '../Form/Input'
 import { Spacer } from '../Spacer'
-import { ControlledDateTime } from '../Form/DateTime'
 import {
-  useCreateCategoryExpenditureMutation,
   useGetCategoryExpenditureQuery,
-  useUpdateCategoryExpenditureInMonthMutation,
-  useUpdateCategoryExpenditureMutation
+  useUpdateCategoryExpenditureInMonthMutation
 } from '../../graphql/generated/graphql'
-import { getCurrentClosestDateTime, parseDate, showMessage } from '../../utils'
-import { ControlledSwitch } from '../Form/Switch'
-import { ControlledYearMonth } from '../Form/YearMonth'
-import { T } from '../T'
-import { colors, rem } from '../../config/styles'
+import { showMessage } from '../../utils'
+import { colors } from '../../config/styles'
 import { LoadingIndicator } from '../Loading'
 import styles from './styles'
 

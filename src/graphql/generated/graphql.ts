@@ -77,6 +77,7 @@ export type CreateCategoryExpenditureInput = {
   date?: InputMaybe<Scalars['DateTime']>;
   description?: InputMaybe<Scalars['String']>;
   numberOfInstallments?: InputMaybe<Scalars['Int']>;
+  paid?: InputMaybe<Scalars['Boolean']>;
   permanent?: InputMaybe<Scalars['Boolean']>;
   permanentUntilYearMonth?: InputMaybe<Scalars['String']>;
   yearMonth: Scalars['String'];
@@ -91,6 +92,7 @@ export type CreateCategoryInput = {
 
 export type CreateMonthlyIncomingInput = {
   amount: Scalars['Float'];
+  description?: InputMaybe<Scalars['String']>;
   endYearMonth?: InputMaybe<Scalars['String']>;
   startYearMonth: Scalars['String'];
 };
@@ -121,6 +123,7 @@ export type MonthlyExpenseInput = {
 export type MonthlyIncoming = {
   __typename?: 'MonthlyIncoming';
   amount: Scalars['Float'];
+  description?: Maybe<Scalars['String']>;
   endYearMonth?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   startYearMonth: Scalars['String'];
@@ -345,6 +348,7 @@ export type UpdateCategoryInput = {
 
 export type UpdateMonthlyIncomingInput = {
   amount?: InputMaybe<Scalars['Float']>;
+  description?: InputMaybe<Scalars['String']>;
   endYearMonth?: InputMaybe<Scalars['String']>;
   startYearMonth?: InputMaybe<Scalars['String']>;
 };
@@ -385,6 +389,13 @@ export type DeleteCategoryMutationVariables = Exact<{
 
 export type DeleteCategoryMutation = { __typename?: 'Mutation', deleteCategory: { __typename?: 'Category', id: string } };
 
+export type GetAvailableBudgetQueryVariables = Exact<{
+  yearMonth: Scalars['String'];
+}>;
+
+
+export type GetAvailableBudgetQuery = { __typename?: 'Query', availableBudget: number };
+
 export type GetCategoryDetailsQueryVariables = Exact<{
   id: Scalars['String'];
 }>;
@@ -414,6 +425,44 @@ export type GetMonthlySummaryQueryVariables = Exact<{
 
 
 export type GetMonthlySummaryQuery = { __typename?: 'Query', totalMonthlyIncomings: number, totalMonthlyExpenses: number, availableBudget: number, categories: Array<{ __typename?: 'Category', id: string, yearMonth: string, name: string, totalExpenses: number }> };
+
+export type MonthlyIncomingFragment = { __typename?: 'MonthlyIncoming', id: string, amount: number, startYearMonth: string, endYearMonth?: string | null, description?: string | null };
+
+export type GetMonthlyIncomingsQueryVariables = Exact<{
+  yearMonth: Scalars['String'];
+}>;
+
+
+export type GetMonthlyIncomingsQuery = { __typename?: 'Query', monthlyIncomings: Array<{ __typename?: 'MonthlyIncoming', id: string, amount: number, startYearMonth: string, endYearMonth?: string | null, description?: string | null }> };
+
+export type GetMonthlyIncomingQueryVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type GetMonthlyIncomingQuery = { __typename?: 'Query', monthlyIncoming: { __typename?: 'MonthlyIncoming', id: string, amount: number, startYearMonth: string, endYearMonth?: string | null, description?: string | null } };
+
+export type CreateMonthlyIncomingMutationVariables = Exact<{
+  data: CreateMonthlyIncomingInput;
+}>;
+
+
+export type CreateMonthlyIncomingMutation = { __typename?: 'Mutation', createMonthlyIncoming: { __typename?: 'MonthlyIncoming', id: string, amount: number, startYearMonth: string, endYearMonth?: string | null, description?: string | null } };
+
+export type UpdateMonthlyIncomingMutationVariables = Exact<{
+  id: Scalars['String'];
+  data: UpdateMonthlyIncomingInput;
+}>;
+
+
+export type UpdateMonthlyIncomingMutation = { __typename?: 'Mutation', updateMonthlyIncoming: { __typename?: 'MonthlyIncoming', id: string, amount: number, startYearMonth: string, endYearMonth?: string | null, description?: string | null } };
+
+export type DeleteMonthlyIncomingMutationVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type DeleteMonthlyIncomingMutation = { __typename?: 'Mutation', deleteMonthlyIncoming: boolean };
 
 export type SignInQueryVariables = Exact<{
   data: SignInWithRefreshTokenInput;
@@ -456,7 +505,15 @@ export type UpdateCategoryMutationVariables = Exact<{
 
 export type UpdateCategoryMutation = { __typename?: 'Mutation', updateCategory: { __typename?: 'Category', id: string, name: string, yearMonth: string, permanent: boolean, permanentUntilYearMonth?: string | null, totalExpenses: number } };
 
-
+export const MonthlyIncomingFragmentDoc = gql`
+    fragment MonthlyIncoming on MonthlyIncoming {
+  id
+  amount
+  startYearMonth
+  endYearMonth
+  description
+}
+    `;
 export const CreateCategoryExpenditureDocument = gql`
     mutation CreateCategoryExpenditure($data: CreateCategoryExpenditureInput!, $yearMonth: String!) {
   createCategoryExpenditure(data: $data) {
@@ -599,6 +656,39 @@ export function useDeleteCategoryMutation(baseOptions?: Apollo.MutationHookOptio
 export type DeleteCategoryMutationHookResult = ReturnType<typeof useDeleteCategoryMutation>;
 export type DeleteCategoryMutationResult = Apollo.MutationResult<DeleteCategoryMutation>;
 export type DeleteCategoryMutationOptions = Apollo.BaseMutationOptions<DeleteCategoryMutation, DeleteCategoryMutationVariables>;
+export const GetAvailableBudgetDocument = gql`
+    query GetAvailableBudget($yearMonth: String!) {
+  availableBudget(filter: {yearMonth: $yearMonth})
+}
+    `;
+
+/**
+ * __useGetAvailableBudgetQuery__
+ *
+ * To run a query within a React component, call `useGetAvailableBudgetQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAvailableBudgetQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAvailableBudgetQuery({
+ *   variables: {
+ *      yearMonth: // value for 'yearMonth'
+ *   },
+ * });
+ */
+export function useGetAvailableBudgetQuery(baseOptions: Apollo.QueryHookOptions<GetAvailableBudgetQuery, GetAvailableBudgetQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAvailableBudgetQuery, GetAvailableBudgetQueryVariables>(GetAvailableBudgetDocument, options);
+      }
+export function useGetAvailableBudgetLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAvailableBudgetQuery, GetAvailableBudgetQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAvailableBudgetQuery, GetAvailableBudgetQueryVariables>(GetAvailableBudgetDocument, options);
+        }
+export type GetAvailableBudgetQueryHookResult = ReturnType<typeof useGetAvailableBudgetQuery>;
+export type GetAvailableBudgetLazyQueryHookResult = ReturnType<typeof useGetAvailableBudgetLazyQuery>;
+export type GetAvailableBudgetQueryResult = Apollo.QueryResult<GetAvailableBudgetQuery, GetAvailableBudgetQueryVariables>;
 export const GetCategoryDetailsDocument = gql`
     query GetCategoryDetails($id: String!) {
   category(id: $id) {
@@ -782,6 +872,174 @@ export function useGetMonthlySummaryLazyQuery(baseOptions?: Apollo.LazyQueryHook
 export type GetMonthlySummaryQueryHookResult = ReturnType<typeof useGetMonthlySummaryQuery>;
 export type GetMonthlySummaryLazyQueryHookResult = ReturnType<typeof useGetMonthlySummaryLazyQuery>;
 export type GetMonthlySummaryQueryResult = Apollo.QueryResult<GetMonthlySummaryQuery, GetMonthlySummaryQueryVariables>;
+export const GetMonthlyIncomingsDocument = gql`
+    query GetMonthlyIncomings($yearMonth: String!) {
+  monthlyIncomings(yearMonth: $yearMonth) {
+    ...MonthlyIncoming
+  }
+}
+    ${MonthlyIncomingFragmentDoc}`;
+
+/**
+ * __useGetMonthlyIncomingsQuery__
+ *
+ * To run a query within a React component, call `useGetMonthlyIncomingsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMonthlyIncomingsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMonthlyIncomingsQuery({
+ *   variables: {
+ *      yearMonth: // value for 'yearMonth'
+ *   },
+ * });
+ */
+export function useGetMonthlyIncomingsQuery(baseOptions: Apollo.QueryHookOptions<GetMonthlyIncomingsQuery, GetMonthlyIncomingsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetMonthlyIncomingsQuery, GetMonthlyIncomingsQueryVariables>(GetMonthlyIncomingsDocument, options);
+      }
+export function useGetMonthlyIncomingsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMonthlyIncomingsQuery, GetMonthlyIncomingsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetMonthlyIncomingsQuery, GetMonthlyIncomingsQueryVariables>(GetMonthlyIncomingsDocument, options);
+        }
+export type GetMonthlyIncomingsQueryHookResult = ReturnType<typeof useGetMonthlyIncomingsQuery>;
+export type GetMonthlyIncomingsLazyQueryHookResult = ReturnType<typeof useGetMonthlyIncomingsLazyQuery>;
+export type GetMonthlyIncomingsQueryResult = Apollo.QueryResult<GetMonthlyIncomingsQuery, GetMonthlyIncomingsQueryVariables>;
+export const GetMonthlyIncomingDocument = gql`
+    query GetMonthlyIncoming($id: String!) {
+  monthlyIncoming(id: $id) {
+    ...MonthlyIncoming
+  }
+}
+    ${MonthlyIncomingFragmentDoc}`;
+
+/**
+ * __useGetMonthlyIncomingQuery__
+ *
+ * To run a query within a React component, call `useGetMonthlyIncomingQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMonthlyIncomingQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMonthlyIncomingQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetMonthlyIncomingQuery(baseOptions: Apollo.QueryHookOptions<GetMonthlyIncomingQuery, GetMonthlyIncomingQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetMonthlyIncomingQuery, GetMonthlyIncomingQueryVariables>(GetMonthlyIncomingDocument, options);
+      }
+export function useGetMonthlyIncomingLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMonthlyIncomingQuery, GetMonthlyIncomingQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetMonthlyIncomingQuery, GetMonthlyIncomingQueryVariables>(GetMonthlyIncomingDocument, options);
+        }
+export type GetMonthlyIncomingQueryHookResult = ReturnType<typeof useGetMonthlyIncomingQuery>;
+export type GetMonthlyIncomingLazyQueryHookResult = ReturnType<typeof useGetMonthlyIncomingLazyQuery>;
+export type GetMonthlyIncomingQueryResult = Apollo.QueryResult<GetMonthlyIncomingQuery, GetMonthlyIncomingQueryVariables>;
+export const CreateMonthlyIncomingDocument = gql`
+    mutation CreateMonthlyIncoming($data: CreateMonthlyIncomingInput!) {
+  createMonthlyIncoming(data: $data) {
+    ...MonthlyIncoming
+  }
+}
+    ${MonthlyIncomingFragmentDoc}`;
+export type CreateMonthlyIncomingMutationFn = Apollo.MutationFunction<CreateMonthlyIncomingMutation, CreateMonthlyIncomingMutationVariables>;
+
+/**
+ * __useCreateMonthlyIncomingMutation__
+ *
+ * To run a mutation, you first call `useCreateMonthlyIncomingMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateMonthlyIncomingMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createMonthlyIncomingMutation, { data, loading, error }] = useCreateMonthlyIncomingMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useCreateMonthlyIncomingMutation(baseOptions?: Apollo.MutationHookOptions<CreateMonthlyIncomingMutation, CreateMonthlyIncomingMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateMonthlyIncomingMutation, CreateMonthlyIncomingMutationVariables>(CreateMonthlyIncomingDocument, options);
+      }
+export type CreateMonthlyIncomingMutationHookResult = ReturnType<typeof useCreateMonthlyIncomingMutation>;
+export type CreateMonthlyIncomingMutationResult = Apollo.MutationResult<CreateMonthlyIncomingMutation>;
+export type CreateMonthlyIncomingMutationOptions = Apollo.BaseMutationOptions<CreateMonthlyIncomingMutation, CreateMonthlyIncomingMutationVariables>;
+export const UpdateMonthlyIncomingDocument = gql`
+    mutation UpdateMonthlyIncoming($id: String!, $data: UpdateMonthlyIncomingInput!) {
+  updateMonthlyIncoming(id: $id, data: $data) {
+    ...MonthlyIncoming
+  }
+}
+    ${MonthlyIncomingFragmentDoc}`;
+export type UpdateMonthlyIncomingMutationFn = Apollo.MutationFunction<UpdateMonthlyIncomingMutation, UpdateMonthlyIncomingMutationVariables>;
+
+/**
+ * __useUpdateMonthlyIncomingMutation__
+ *
+ * To run a mutation, you first call `useUpdateMonthlyIncomingMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateMonthlyIncomingMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateMonthlyIncomingMutation, { data, loading, error }] = useUpdateMonthlyIncomingMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useUpdateMonthlyIncomingMutation(baseOptions?: Apollo.MutationHookOptions<UpdateMonthlyIncomingMutation, UpdateMonthlyIncomingMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateMonthlyIncomingMutation, UpdateMonthlyIncomingMutationVariables>(UpdateMonthlyIncomingDocument, options);
+      }
+export type UpdateMonthlyIncomingMutationHookResult = ReturnType<typeof useUpdateMonthlyIncomingMutation>;
+export type UpdateMonthlyIncomingMutationResult = Apollo.MutationResult<UpdateMonthlyIncomingMutation>;
+export type UpdateMonthlyIncomingMutationOptions = Apollo.BaseMutationOptions<UpdateMonthlyIncomingMutation, UpdateMonthlyIncomingMutationVariables>;
+export const DeleteMonthlyIncomingDocument = gql`
+    mutation DeleteMonthlyIncoming($id: String!) {
+  deleteMonthlyIncoming(id: $id)
+}
+    `;
+export type DeleteMonthlyIncomingMutationFn = Apollo.MutationFunction<DeleteMonthlyIncomingMutation, DeleteMonthlyIncomingMutationVariables>;
+
+/**
+ * __useDeleteMonthlyIncomingMutation__
+ *
+ * To run a mutation, you first call `useDeleteMonthlyIncomingMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteMonthlyIncomingMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteMonthlyIncomingMutation, { data, loading, error }] = useDeleteMonthlyIncomingMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteMonthlyIncomingMutation(baseOptions?: Apollo.MutationHookOptions<DeleteMonthlyIncomingMutation, DeleteMonthlyIncomingMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteMonthlyIncomingMutation, DeleteMonthlyIncomingMutationVariables>(DeleteMonthlyIncomingDocument, options);
+      }
+export type DeleteMonthlyIncomingMutationHookResult = ReturnType<typeof useDeleteMonthlyIncomingMutation>;
+export type DeleteMonthlyIncomingMutationResult = Apollo.MutationResult<DeleteMonthlyIncomingMutation>;
+export type DeleteMonthlyIncomingMutationOptions = Apollo.BaseMutationOptions<DeleteMonthlyIncomingMutation, DeleteMonthlyIncomingMutationVariables>;
 export const SignInDocument = gql`
     query SignIn($data: SignInWithRefreshTokenInput!) {
   signInWithRefreshToken(data: $data) {

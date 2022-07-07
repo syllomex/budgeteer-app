@@ -1,0 +1,38 @@
+fragment MonthlyIncoming on MonthlyIncoming {
+  id
+  amount
+  startYearMonth
+  endYearMonth
+  description
+}
+
+query GetMonthlyIncomings($yearMonth: String!) {
+  monthlyIncomings(yearMonth: $yearMonth) {
+    ...MonthlyIncoming
+  }
+}
+
+query GetMonthlyIncoming($id: String!) {
+  monthlyIncoming(id: $id) {
+    ...MonthlyIncoming
+  }
+}
+
+mutation CreateMonthlyIncoming($data: CreateMonthlyIncomingInput!) {
+  createMonthlyIncoming(data: $data) {
+    ...MonthlyIncoming
+  }
+}
+
+mutation UpdateMonthlyIncoming(
+  $id: String!
+  $data: UpdateMonthlyIncomingInput!
+) {
+  updateMonthlyIncoming(id: $id, data: $data) {
+    ...MonthlyIncoming
+  }
+}
+
+mutation DeleteMonthlyIncoming($id: String!) {
+  deleteMonthlyIncoming(id: $id)
+}

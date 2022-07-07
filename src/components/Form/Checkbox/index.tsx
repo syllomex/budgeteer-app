@@ -33,7 +33,7 @@ export const Checkbox: React.FunctionComponent<CheckboxProps> = ({
   return (
     <TouchableOpacity onPress={handleCheck} style={styles.container}>
       <Ionicons
-        name="checkmark-circle-outline"
+        name={checked ? 'checkmark-circle-outline' : 'ellipse-outline'}
         color={checked ? colors.primary : colors['border-line']}
         size={rem(2.4)}
       />

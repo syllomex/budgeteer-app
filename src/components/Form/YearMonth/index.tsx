@@ -4,7 +4,8 @@ import React, {
   useState,
   useImperativeHandle,
   forwardRef,
-  useRef
+  useRef,
+  useCallback
 } from 'react'
 import { Control, Controller } from 'react-hook-form'
 import {
@@ -16,13 +17,14 @@ import {
 } from 'react-native'
 import Picker from 'react-native-month-year-picker'
 import { dateToYearMonth, displayDate, yearMonthToDate } from '../../../utils'
+import { ClearButton } from '../ClearButton'
 import { Label } from '../Label'
 
 import styles from '../_styles'
 
 interface YearMonthPickerProps {
   defaultValue?: string | null
-  onSelect?: (yearMonth: string) => void
+  onSelect?: (yearMonth: string | null) => void
 }
 
 export interface YearMonthPickerHandles {
@@ -32,13 +34,17 @@ export interface YearMonthPickerHandles {
 export const YearMonthPickerComponent: ForwardRefRenderFunction<
   YearMonthPickerHandles,
   YearMonthPickerProps
-> = ({ defaultValue, onSelect }, ref) => {
+> = ({ defaultValue, onSelect: _onSelect }, ref) => {
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState(
     yearMonthToDate(defaultValue) ?? new Date()
   )
 
-  useImperativeHandle(ref, () => ({ open: () => setOpen(true) }))
+  const onSelect = useRef(_onSelect)
+
+  useImperativeHandle(ref, () => ({
+    open: () => setOpen(true)
+  }))
 
   if (!open) return null
 
@@ -49,7 +55,7 @@ export const YearMonthPickerComponent: ForwardRefRenderFunction<
         setOpen(false)
         if (ev === 'dateSetAction') {
           setValue(newDate)
-          onSelect?.(dateToYearMonth(newDate))
+          onSelect.current?.(dateToYearMonth(newDate))
         }
       }}
       locale="pt"
@@ -64,6 +70,7 @@ interface YearMonthProps extends YearMonthPickerProps {
   required?: boolean
   placeholder?: string
   containerStyle?: StyleProp<ViewStyle>
+  clearEnabled?: boolean
 }
 
 export const YearMonth: FunctionComponent<YearMonthProps> = ({
@@ -72,11 +79,17 @@ export const YearMonth: FunctionComponent<YearMonthProps> = ({
   required,
   placeholder,
   onSelect,
-  containerStyle
+  containerStyle,
+  clearEnabled
 }) => {
   const ref = useRef<YearMonthPickerHandles>(null)
 
   const [value, setValue] = useState<string | undefined | null>(defaultValue)
+
+  const clear = useCallback(() => {
+    onSelect?.(null)
+    setValue(null)
+  }, [onSelect])
 
   return (
     <View style={containerStyle}>
@@ -86,15 +99,18 @@ export const YearMonth: FunctionComponent<YearMonthProps> = ({
         onPress={() => ref.current?.open?.()}
         style={styles.container}
       >
-        <TextInput
-          style={[styles.inputText, !value && styles.placeholder]}
-          editable={false}
-          value={
-            value
-              ? displayDate(yearMonthToDate(value) as Date, "MMMM'/'yyyy")
-              : placeholder ?? 'Selecionar mês/ano'
-          }
-        />
+        <View style={styles.inputTextContainer}>
+          <TextInput
+            style={[styles.inputText, !value && styles.placeholder]}
+            editable={false}
+            value={
+              value
+                ? displayDate(yearMonthToDate(value) as Date, "MMMM'/'yyyy")
+                : placeholder ?? 'Selecionar mês/ano'
+            }
+          />
+          {clearEnabled && !!value && <ClearButton onPress={clear} />}
+        </View>
       </TouchableOpacity>
 
       <YearMonthPicker
@@ -121,6 +137,7 @@ export const ControlledYearMonth: FunctionComponent<
     <Controller
       control={control}
       name={name}
+      defaultValue={props.defaultValue}
       render={({ field }) => (
         <YearMonth
           {...props}

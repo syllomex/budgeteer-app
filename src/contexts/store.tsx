@@ -27,6 +27,10 @@ import {
   MonthlyExpenditureForm,
   MonthlyExpenditureFormHandles
 } from '../components/ExpenditureMonthlyForm'
+import {
+  MonthlyIncomingForm,
+  MonthlyIncomingFormHandles
+} from '../components/MonthlyIncomingForm'
 import { useAuth } from './auth'
 
 const Store = createContext(
@@ -37,8 +41,15 @@ const Store = createContext(
     closeCategoryModal(): void
     openExpenditureModal?: PropType<ExpenditureFormHandles, 'open'>
     closeExpenditureModal?: PropType<ExpenditureFormHandles, 'close'>
-    openExpenditureMonthlyModal?: PropType<MonthlyExpenditureFormHandles, 'open'>
-    closeExpenditureMonthlyModal?: PropType<MonthlyExpenditureFormHandles, 'close'>
+    openExpenditureMonthlyModal?: PropType<
+      MonthlyExpenditureFormHandles,
+      'open'
+    >
+    closeExpenditureMonthlyModal?: PropType<
+      MonthlyExpenditureFormHandles,
+      'close'
+    >
+    monthlyIncomingForm: React.RefObject<MonthlyIncomingFormHandles>
     data: GetMonthlySummaryQuery | undefined
     refetch(): Promise<GetMonthlySummaryQuery>
     refreshing: boolean
@@ -50,6 +61,7 @@ export const StoreProvider: FunctionComponent = ({ children }) => {
   const categoryModalRef = useRef<Modalize>(null)
   const expenditureFormRef = useRef<ExpenditureFormHandles>(null)
   const monthlyExpenditureFormRef = useRef<ExpenditureFormHandles>(null)
+  const monthlyIncomingForm = useRef<MonthlyIncomingFormHandles>(null)
 
   const [month, setMonth] = useState(getCurrentMonth())
   const [editingCategoryId, setEditingCategoryId] = useState<string>()
@@ -102,6 +114,7 @@ export const StoreProvider: FunctionComponent = ({ children }) => {
         closeExpenditureModal,
         openExpenditureMonthlyModal,
         closeExpenditureMonthlyModal,
+        monthlyIncomingForm,
         data,
         refetch: async () => {
           return (await refetch()).data
@@ -130,6 +143,7 @@ export const StoreProvider: FunctionComponent = ({ children }) => {
         ref={monthlyExpenditureFormRef}
         yearMonth={month}
       />
+      <MonthlyIncomingForm ref={monthlyIncomingForm} yearMonth={month} />
     </Store.Provider>
   )
 }

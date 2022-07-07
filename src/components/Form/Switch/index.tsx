@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Switch as SwitchComponent, View } from 'react-native'
 import { Control, Controller } from 'react-hook-form'
 import { T } from '../../T'
@@ -8,10 +8,20 @@ interface SwitchProps {
   defaultValue?: boolean
   onChange?: (value: boolean) => void
   label?: string
+  value?: boolean
 }
 
-export const Switch = ({ defaultValue, onChange, label }: SwitchProps) => {
+export const Switch = ({
+  defaultValue,
+  onChange,
+  label,
+  value: _value
+}: SwitchProps) => {
   const [value, setValue] = useState(defaultValue ?? false)
+
+  useEffect(() => {
+    if (typeof _value === 'boolean') setValue(_value)
+  }, [_value])
 
   return (
     <View style={{ flexDirection: 'row', paddingVertical: rem(1) }}>
@@ -24,7 +34,10 @@ export const Switch = ({ defaultValue, onChange, label }: SwitchProps) => {
         }}
         value={value}
         thumbColor={value ? colors.primary : colors['background-matte+2']}
-        trackColor={{ true: colors['primary-1'], false: colors['background-matte+1'] }}
+        trackColor={{
+          true: colors['primary-1'],
+          false: colors['background-matte+1']
+        }}
       />
     </View>
   )

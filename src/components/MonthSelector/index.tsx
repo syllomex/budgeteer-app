@@ -29,12 +29,17 @@ export const MonthSelector: React.FunctionComponent = () => {
   const description = useMemo(() => {
     if (!data) return ''
     if (fetching) return refreshingText
-    return `Gastos: ${monetize(data.totalMonthlyExpenses)}`
+    return `Renda: ${monetize(data.totalMonthlyIncomings)}\nGastos: ${monetize(
+      data.totalMonthlyExpenses
+    )}`
   }, [data, fetching, refreshingText])
 
   return (
     <View style={styles.monthSelectorContainer}>
-      <YearMonthPicker ref={yearMonthPicker} onSelect={setMonth} />
+      <YearMonthPicker
+        ref={yearMonthPicker}
+        onSelect={month => setMonth(month as string)}
+      />
 
       <View style={styles.monthSelectorRow}>
         <TouchableOpacity style={styles.arrowContainer} onPress={goToPrevMonth}>
@@ -47,7 +52,9 @@ export const MonthSelector: React.FunctionComponent = () => {
           <T f="semiBold" s={1.6}>
             {displayYearMonth(month)}
           </T>
-          <T c="muted">{description}</T>
+          <T c="muted" style={{ textAlign: 'center', lineHeight: rem(2) }}>
+            {description}
+          </T>
         </TouchableOpacity>
         <TouchableOpacity style={styles.arrowContainer} onPress={goToNextMonth}>
           <MaterialIcons name="arrow-forward" {...arrowProps} />

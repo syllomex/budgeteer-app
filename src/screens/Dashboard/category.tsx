@@ -1,7 +1,7 @@
 import React, { useCallback, useRef } from 'react'
 import { TouchableOpacity, View } from 'react-native'
 
-import { Feather, Ionicons } from '@expo/vector-icons'
+import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
 import { T } from '../../components/T'
 import { monetize, PropType, showMessage, Unpacked } from '../../utils'
@@ -12,7 +12,11 @@ import {
   GetMonthlySummaryQuery,
   useDeleteCategoryMutation
 } from '../../graphql/generated/graphql'
-import { SlideMenu, SlideMenuHandles } from '../../components/SlideMenu'
+import {
+  OptionPresets,
+  SlideMenu,
+  SlideMenuHandles
+} from '../../components/SlideMenu'
 import { LoadingOverlay } from '../../components/Loading'
 import { confirm } from '../../components/Confirm'
 import styles from './category.styles'
@@ -29,7 +33,7 @@ export const Category: React.FunctionComponent<CategoryProps> = ({ data }) => {
 
   const [deleteCategory, { loading }] = useDeleteCategoryMutation({
     variables: { id: data.id },
-    refetchQueries: ['GetMonthlySummary'],
+    refetchQueries: ['GetMonthlySummary', 'GetAvailableBudget'],
     onCompleted () {
       showMessage({ message: 'Categoria removida!' })
     },
@@ -81,17 +85,10 @@ export const Category: React.FunctionComponent<CategoryProps> = ({ data }) => {
             icon: props => <Ionicons name="cart-outline" {...props} />,
             onPress: () => openExpenditureModal?.({ categoryId: data.id })
           },
-          {
-            label: 'Editar',
-            icon: props => <Feather name="edit" {...props} />,
+          OptionPresets.edit({
             onPress: () => openCategoryModal({ categoryId: data.id })
-          },
-          {
-            label: 'Remover',
-            color: 'danger',
-            icon: props => <Feather name="trash" {...props} />,
-            onPress: handleDelete
-          }
+          }),
+          OptionPresets.delete({ onPress: handleDelete })
         ]}
       />
 

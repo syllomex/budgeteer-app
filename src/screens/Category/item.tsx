@@ -41,6 +41,11 @@ export const Item: React.FunctionComponent<ItemProps> = ({
 
   const [updateMonthlyExpenditure, { loading: updating }] =
     useUpdateCategoryExpenditureInMonthMutation({
+      refetchQueries: [
+        'GetCategory',
+        'GetMonthlySummary',
+        'GetAvailableBudget'
+      ],
       onCompleted () {
         showMessage({ message: 'Despesa atualizada!' })
       },
@@ -56,7 +61,7 @@ export const Item: React.FunctionComponent<ItemProps> = ({
   const [deleteExpenditure, { loading: deleting }] =
     useDeleteCategoryExpenditureMutation({
       variables: { id: data.id },
-      refetchQueries: ['GetCategory', 'GetMonthlySummary']
+      refetchQueries: ['GetCategory', 'GetMonthlySummary', 'GetAvailableBudget']
     })
 
   const handleUpdateExpenditure = useCallback(async () => {

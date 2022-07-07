@@ -10,17 +10,19 @@ interface IconProps {
 interface FloatingButtonProps {
   onPress?: () => void | Promise<void>
   icon?: (props: IconProps) => JSX.Element
+  bottom?: number
 }
 
 export const FloatingButton: React.FunctionComponent<FloatingButtonProps> = ({
   onPress,
-  icon
+  icon,
+  bottom = 0
 }) => {
   return (
     <TouchableOpacity
       style={{
         position: 'absolute',
-        bottom: rem(2),
+        bottom: rem(2) + rem(bottom),
         right: rem(2),
         width: rem(4.8),
         height: rem(4.8),

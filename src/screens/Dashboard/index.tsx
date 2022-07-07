@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { RefreshControl, ScrollView, View } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 
 import { MonthSelector } from '../../components/MonthSelector'
 import { NoContent } from '../../components/NoContent'
@@ -14,7 +14,8 @@ import { Category, NewCategoryButton } from './category'
 import styles from './styles'
 
 export const Dashboard = () => {
-  const { openCategoryModal, data, refetch, refreshing } = useStore()
+  const { openCategoryModal, data, refetch, refreshing, monthlyIncomingForm } =
+    useStore()
 
   const categories = useMemo(() => {
     if (!data) return null
@@ -29,6 +30,12 @@ export const Dashboard = () => {
       <FloatingButton
         onPress={openCategoryModal}
         icon={props => <Ionicons {...props} name="add-outline" />}
+      />
+
+      <FloatingButton
+        onPress={() => monthlyIncomingForm.current?.open()}
+        icon={props => <MaterialIcons name="attach-money" {...props} />}
+        bottom={6}
       />
 
       <ScrollView

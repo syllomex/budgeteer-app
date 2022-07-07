@@ -1,0 +1,3 @@
+query GetAvailableBudget($yearMonth: String!) {
+  availableBudget(filter: { yearMonth: $yearMonth })
+}

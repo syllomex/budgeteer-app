@@ -1,3 +1,4 @@
+import { Feather } from '@expo/vector-icons'
 import React, {
   forwardRef,
   useCallback,
@@ -115,3 +116,17 @@ const SlideMenuComponent: React.ForwardRefRenderFunction<
 }
 
 export const SlideMenu = forwardRef(SlideMenuComponent)
+
+export const OptionPresets = {
+  edit: (props: Partial<Option>): Option => ({
+    label: 'Editar',
+    icon: icon => <Feather name="edit" {...icon} />,
+    ...props
+  }),
+  delete: (props: Partial<Option>): Option => ({
+    label: 'Remover',
+    color: 'danger',
+    icon: icon => <Feather name="trash" {...icon} />,
+    ...props
+  })
+}

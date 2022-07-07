@@ -88,7 +88,11 @@ const ExpenditureFormComponent: React.ForwardRefRenderFunction<
 
   const [createExpenditure, { loading: creating }] =
     useCreateCategoryExpenditureMutation({
-      refetchQueries: ['GetCategory', 'GetMonthlySummary'],
+      refetchQueries: [
+        'GetCategory',
+        'GetMonthlySummary',
+        'GetAvailableBudget'
+      ],
       onCompleted () {
         showMessage({ message: 'Despesa adicionada!' })
         modalRef.current?.close()
@@ -105,7 +109,11 @@ const ExpenditureFormComponent: React.ForwardRefRenderFunction<
 
   const [updateExpenditure, { loading: updating }] =
     useUpdateCategoryExpenditureMutation({
-      refetchQueries: ['GetCategory', 'GetMonthlySummary'],
+      refetchQueries: [
+        'GetCategory',
+        'GetMonthlySummary',
+        'GetAvailableBudget'
+      ],
       onCompleted () {
         showMessage({ message: 'Despesa atualizada!' })
         modalRef.current?.close()
@@ -180,7 +188,6 @@ const ExpenditureFormComponent: React.ForwardRefRenderFunction<
         showsVerticalScrollIndicator: false
       }}
       overlayStyle={{ backgroundColor: colors.overlay }}
-      withReactModal
       onClose={() => {
         setVisible(false)
         setCategoryId(null)

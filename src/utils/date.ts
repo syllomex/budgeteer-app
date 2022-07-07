@@ -47,3 +47,11 @@ export const getCurrentClosestDateTime = () => {
     new Date().setMinutes(closest(new Date().getMinutes(), [0, 15, 30, 45]))
   )
 }
+
+export const getCurrentYearMonth = () => {
+  return dateToYearMonth(new Date())
+}
+
+export const isCurrentMonth = (yearMonth: string) => {
+  return yearMonth === getCurrentYearMonth()
+}
