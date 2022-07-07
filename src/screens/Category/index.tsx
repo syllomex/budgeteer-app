@@ -1,8 +1,8 @@
 import { NetworkStatus } from '@apollo/client'
 import { Ionicons } from '@expo/vector-icons'
 import { RouteProp, useRoute } from '@react-navigation/native'
-import React, { useRef } from 'react'
-import { RefreshControl, ScrollView, View } from 'react-native'
+import React, { useMemo, useRef } from 'react'
+import { FlatList, View } from 'react-native'
 
 import {
   ExpenditureForm,
@@ -11,6 +11,7 @@ import {
 import { FloatingButton } from '../../components/FloatingButton'
 import { LoadingIndicator } from '../../components/Loading'
 import { NoContent } from '../../components/NoContent'
+import { Separator } from '../../components/Separator'
 import { useStore } from '../../contexts/store'
 import { useGetCategoryQuery } from '../../graphql/generated/graphql'
 import { useScreenTitle } from '../../hooks/useScreenTitle'
@@ -32,6 +33,16 @@ export const Category: React.FunctionComponent = () => {
     fetchPolicy: 'cache-and-network'
   })
 
+  const ListEmptyComponent = useMemo(() => {
+    if (!data) return <LoadingIndicator />
+
+    if (data?.category.expenditures.length === 0) {
+      return <NoContent visible>Nenhuma despesa nessa categoria</NoContent>
+    }
+
+    return null
+  }, [data])
+
   return (
     <View style={styles.container}>
       <ExpenditureForm
@@ -44,29 +55,19 @@ export const Category: React.FunctionComponent = () => {
         onPress={() => expenditureFormRef.current?.open()}
         icon={props => <Ionicons name="add-outline" {...props} />}
       />
-      <ScrollView
+
+      <FlatList
         contentContainerStyle={styles.contentContainer}
-        refreshControl={
-          <RefreshControl
-            onRefresh={refetch}
-            refreshing={networkStatus === NetworkStatus.refetch}
-          />
-        }
-      >
-        {!data && <LoadingIndicator />}
-
-        <NoContent visible={data?.category.expenditures?.length === 0}>
-          Nenhuma despesa nessa categoria
-        </NoContent>
-
-        {data?.category.expenditures.map(expenditure => (
-          <Item
-            key={expenditure.id}
-            data={expenditure}
-            categoryId={params.category.id}
-          />
-        ))}
-      </ScrollView>
+        data={data?.category.expenditures}
+        keyExtractor={({ id }) => id.toString()}
+        ListEmptyComponent={ListEmptyComponent}
+        onRefresh={refetch}
+        refreshing={networkStatus === NetworkStatus.refetch}
+        ItemSeparatorComponent={Separator}
+        renderItem={({ item }) => (
+          <Item data={item} categoryId={params.category.id} />
+        )}
+      />
     </View>
   )
 }
