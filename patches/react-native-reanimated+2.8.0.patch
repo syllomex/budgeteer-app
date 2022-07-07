@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-reanimated/android/src/main/java/com/swmansion/reanimated/layoutReanimation/ReanimatedUIImplementation.java b/node_modules/react-native-reanimated/android/src/main/java/com/swmansion/reanimated/layoutReanimation/ReanimatedUIImplementation.java
+index 36d6a4a..372dac9 100644
+--- a/node_modules/react-native-reanimated/android/src/main/java/com/swmansion/reanimated/layoutReanimation/ReanimatedUIImplementation.java
++++ b/node_modules/react-native-reanimated/android/src/main/java/com/swmansion/reanimated/layoutReanimation/ReanimatedUIImplementation.java
+@@ -10,7 +10,7 @@ import java.util.List;
+ public class ReanimatedUIImplementation extends UIImplementation {
+   public ReanimatedUIImplementation(
+       ReactApplicationContext reactContext,
+-      ViewManagerResolver viewManagerResolver,
++      UIManagerModule.ViewManagerResolver viewManagerResolver,
+       EventDispatcher eventDispatcher,
+       int minTimeLeftInFrameForNonBatchedOperationMs) {
+     this(
