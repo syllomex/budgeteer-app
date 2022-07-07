@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Control, Controller } from 'react-hook-form'
 import { TouchableOpacity } from 'react-native'
 
@@ -10,13 +10,19 @@ import styles from './styles'
 interface CheckboxProps {
   label?: string
   onChange?: (value: boolean) => void | Promise<void>
+  value?: boolean
 }
 
 export const Checkbox: React.FunctionComponent<CheckboxProps> = ({
   label,
-  onChange
+  onChange,
+  value
 }) => {
-  const [checked, setChecked] = useState(false)
+  const [checked, setChecked] = useState(value ?? false)
+
+  useEffect(() => {
+    if (typeof value === 'boolean') setChecked(value)
+  }, [value])
 
   const handleCheck = useCallback(() => {
     const newValue = !checked
@@ -28,7 +34,7 @@ export const Checkbox: React.FunctionComponent<CheckboxProps> = ({
     <TouchableOpacity onPress={handleCheck} style={styles.container}>
       <Ionicons
         name="checkmark-circle-outline"
-        color={checked ? colors.primary : colors.placeholder}
+        color={checked ? colors.primary : colors['border-line']}
         size={rem(2.4)}
       />
       {!!label && <T style={styles.text}>{label}</T>}

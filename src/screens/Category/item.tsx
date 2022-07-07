@@ -2,13 +2,15 @@ import { Feather } from '@expo/vector-icons'
 import React, { useCallback, useMemo, useRef } from 'react'
 import { TouchableOpacity, View } from 'react-native'
 import { confirm } from '../../components/Confirm'
-import { LoadingOverlay } from '../../components/Loading'
+import { Checkbox } from '../../components/Form/Checkbox'
+import { LoadingIndicator, LoadingOverlay } from '../../components/Loading'
 import { SlideMenu, SlideMenuHandles } from '../../components/SlideMenu'
 import { T } from '../../components/T'
 import { useStore } from '../../contexts/store'
 import {
   GetCategoryQuery,
-  useDeleteCategoryExpenditureMutation
+  useDeleteCategoryExpenditureMutation,
+  useUpdateCategoryExpenditureInMonthMutation
 } from '../../graphql/generated/graphql'
 import {
   monetize,
@@ -32,9 +34,24 @@ export const Item: React.FunctionComponent<ItemProps> = ({
   data,
   categoryId
 }) => {
-  const { openExpenditureModal, openExpenditureMonthlyModal } = useStore()
+  const { openExpenditureModal, openExpenditureMonthlyModal, yearMonth } =
+    useStore()
 
   const slideMenu = useRef<SlideMenuHandles>(null)
+
+  const [updateMonthlyExpenditure, { loading: updating }] =
+    useUpdateCategoryExpenditureInMonthMutation({
+      onCompleted () {
+        showMessage({ message: 'Despesa atualizada!' })
+      },
+      onError (err) {
+        showMessage({
+          message: 'Não foi possível atualizar a despesa.',
+          description: err.message,
+          type: 'error'
+        })
+      }
+    })
 
   const [deleteExpenditure, { loading: deleting }] =
     useDeleteCategoryExpenditureMutation({
@@ -74,6 +91,16 @@ export const Item: React.FunctionComponent<ItemProps> = ({
     return ` ${data.currentInstallment ?? 0}/${data.numberOfInstallments}`
   }, [data.currentInstallment, data.numberOfInstallments])
 
+  const isPaid = useMemo(() => {
+    return !!data.monthly?.paid
+  }, [data.monthly?.paid])
+
+  const handleTogglePaid = useCallback(async () => {
+    await updateMonthlyExpenditure({
+      variables: { id: data.id, yearMonth, data: { paid: !isPaid } }
+    })
+  }, [data.id, isPaid, updateMonthlyExpenditure, yearMonth])
+
   return (
     <TouchableOpacity
       key={data.id}
@@ -82,41 +109,50 @@ export const Item: React.FunctionComponent<ItemProps> = ({
     >
       <LoadingOverlay visible={deleting} />
 
-      <SlideMenu
-        ref={slideMenu}
-        shouldAwait={false}
-        options={[
-          {
-            label: 'Editar',
-            onPress: handleUpdateExpenditure,
-            icon: props => <Feather name="edit" {...props} />
-          },
-          {
-            label: 'Editar valor no mês atual',
-            onPress: handleUpdateInMonth,
-            icon: props => <Feather name="calendar" {...props} />
-          },
-          {
-            label: 'Remover',
-            onPress: handleDeleteExpenditure,
-            color: 'danger',
-            icon: props => <Feather name="trash" {...props} />
-          }
-        ]}
-      />
+      <View style={styles.checkBoxContainer}>
+        {updating ? (
+          <LoadingIndicator size="small" />
+        ) : (
+          <Checkbox onChange={handleTogglePaid} value={isPaid} />
+        )}
+      </View>
+      <View style={styles.expenditureContainer}>
+        <SlideMenu
+          ref={slideMenu}
+          shouldAwait={false}
+          options={[
+            {
+              label: 'Editar',
+              onPress: handleUpdateExpenditure,
+              icon: props => <Feather name="edit" {...props} />
+            },
+            {
+              label: 'Editar valor no mês atual',
+              onPress: handleUpdateInMonth,
+              icon: props => <Feather name="calendar" {...props} />
+            },
+            {
+              label: 'Remover',
+              onPress: handleDeleteExpenditure,
+              color: 'danger',
+              icon: props => <Feather name="trash" {...props} />
+            }
+          ]}
+        />
 
-      <View style={styles.row}>
-        <T style={{ flex: 1 }} c="muted">
-          {parseAndDisplay(data.date, { displayFormat: 'Pp' })}
-        </T>
-        <T f="medium" s={1.6} c="primary">
-          {monetize(data.monthly?.amount ?? data.amount)}
+        <View style={styles.row}>
+          <T style={{ flex: 1 }} c="muted">
+            {parseAndDisplay(data.date, { displayFormat: 'Pp' })}
+          </T>
+          <T f="medium" s={1.6} c="primary">
+            {monetize(data.monthly?.amount ?? data.amount)}
+          </T>
+        </View>
+        <T f={data.description ? 'regular' : 'italic'}>
+          {data.description ? data.description : 'Sem descrição'}
+          {installments}
         </T>
       </View>
-      <T f={data.description ? 'regular' : 'italic'}>
-        {data.description ?? 'Sem descrição'}
-        {installments}
-      </T>
     </TouchableOpacity>
   )
 }

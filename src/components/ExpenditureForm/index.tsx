@@ -48,6 +48,7 @@ type FormData = {
   permanent: boolean
   permanentUntilYearMonth?: string
   numberOfInstallments?: number
+  paid?: boolean
 }
 
 const schema = yup.object().shape({
@@ -220,6 +221,8 @@ const ExpenditureFormComponent: React.ForwardRefRenderFunction<
                 getCurrentClosestDateTime()
               }
             />
+
+            <ControlledSwitch control={control} name="paid" label="Pago" />
 
             <ControlledSwitch
               control={control}

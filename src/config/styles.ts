@@ -22,6 +22,7 @@ export const colors = {
   'text-in-primary': '#FFFFFF',
   success: '#66AAEE',
   warning: '#FFFF66',
+  'warning+1': '#dbb116',
   danger: '#EE6666',
   /**
    * @deprecated

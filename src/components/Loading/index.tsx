@@ -27,8 +27,12 @@ export const useLoadingText = ({
   return `${text}${new Array(count).fill('.').join('')}`
 }
 
-export const LoadingIndicator = () => {
-  return <ActivityIndicator size="large" color={colors.primary} />
+export const LoadingIndicator = ({
+  size = 'large'
+}: {
+  size?: 'large' | 'small'
+}) => {
+  return <ActivityIndicator size={size} color={colors.primary} />
 }
 
 export const LoadingOverlay = ({ visible }: { visible: boolean }) => {

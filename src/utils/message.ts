@@ -9,5 +9,10 @@ export const showMessage = ({
   type?: 'success' | 'error'
   description?: string
 }) => {
-  Toast.show({ text1: message, type: type ?? 'success', text2: description })
+  Toast.show({
+    text1: message,
+    type: type ?? 'success',
+    text2: description,
+    visibilityTime: type === 'error' ? 8000 : 4000
+  })
 }

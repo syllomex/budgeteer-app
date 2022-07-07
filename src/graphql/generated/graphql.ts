@@ -96,7 +96,8 @@ export type CreateMonthlyIncomingInput = {
 };
 
 export type CreateOrUpdateMonthlyCategoryExpenditureInput = {
-  amount: Scalars['Float'];
+  amount?: InputMaybe<Scalars['Float']>;
+  paid?: InputMaybe<Scalars['Boolean']>;
 };
 
 export type CreateUserInput = {
@@ -109,6 +110,7 @@ export type MonthlyCategoryExpenditure = {
   amount: Scalars['Float'];
   createdAt: Scalars['DateTime'];
   id: Scalars['String'];
+  paid?: Maybe<Scalars['Boolean']>;
   yearMonth: Scalars['String'];
 };
 
@@ -396,7 +398,7 @@ export type GetCategoryExpenditureQueryVariables = Exact<{
 }>;
 
 
-export type GetCategoryExpenditureQuery = { __typename?: 'Query', categoryExpenditure: { __typename?: 'CategoryExpenditure', id: string, description?: string | null, amount: number, date?: any | null, numberOfInstallments?: number | null, permanent?: boolean | null, permanentUntilYearMonth?: string | null, category: { __typename?: 'Category', id: string, name: string }, monthly?: { __typename?: 'MonthlyCategoryExpenditure', id: string, amount: number } | null } };
+export type GetCategoryExpenditureQuery = { __typename?: 'Query', categoryExpenditure: { __typename?: 'CategoryExpenditure', id: string, description?: string | null, amount: number, date?: any | null, numberOfInstallments?: number | null, permanent?: boolean | null, permanentUntilYearMonth?: string | null, category: { __typename?: 'Category', id: string, name: string }, monthly?: { __typename?: 'MonthlyCategoryExpenditure', id: string, amount: number, paid?: boolean | null } | null } };
 
 export type GetCategoryQueryVariables = Exact<{
   id: Scalars['String'];
@@ -404,7 +406,7 @@ export type GetCategoryQueryVariables = Exact<{
 }>;
 
 
-export type GetCategoryQuery = { __typename?: 'Query', category: { __typename?: 'Category', id: string, name: string, totalExpenses: number, expenditures: Array<{ __typename?: 'CategoryExpenditure', id: string, description?: string | null, amount: number, date?: any | null, numberOfInstallments?: number | null, currentInstallment?: number | null, monthly?: { __typename?: 'MonthlyCategoryExpenditure', id: string, amount: number } | null }> } };
+export type GetCategoryQuery = { __typename?: 'Query', category: { __typename?: 'Category', id: string, name: string, totalExpenses: number, expenditures: Array<{ __typename?: 'CategoryExpenditure', id: string, description?: string | null, amount: number, date?: any | null, numberOfInstallments?: number | null, currentInstallment?: number | null, monthly?: { __typename?: 'MonthlyCategoryExpenditure', id: string, amount: number, paid?: boolean | null } | null }> } };
 
 export type GetMonthlySummaryQueryVariables = Exact<{
   yearMonth: Scalars['String'];
@@ -434,7 +436,7 @@ export type UpdateCategoryExpenditureInMonthMutationVariables = Exact<{
 }>;
 
 
-export type UpdateCategoryExpenditureInMonthMutation = { __typename?: 'Mutation', updateCategoryExpenditureInMonth: { __typename?: 'CategoryExpenditure', id: string, description?: string | null, amount: number, date?: any | null, numberOfInstallments?: number | null, currentInstallment?: number | null, monthly?: { __typename?: 'MonthlyCategoryExpenditure', id: string, amount: number } | null } };
+export type UpdateCategoryExpenditureInMonthMutation = { __typename?: 'Mutation', updateCategoryExpenditureInMonth: { __typename?: 'CategoryExpenditure', id: string, description?: string | null, amount: number, date?: any | null, numberOfInstallments?: number | null, currentInstallment?: number | null, monthly?: { __typename?: 'MonthlyCategoryExpenditure', id: string, amount: number, paid?: boolean | null } | null } };
 
 export type UpdateCategoryExpenditureMutationVariables = Exact<{
   id: Scalars['String'];
@@ -654,6 +656,7 @@ export const GetCategoryExpenditureDocument = gql`
     monthly(yearMonth: $yearMonth) {
       id
       amount
+      paid
     }
   }
 }
@@ -703,6 +706,7 @@ export const GetCategoryDocument = gql`
       monthly(yearMonth: $yearMonth) {
         id
         amount
+        paid
       }
     }
   }
@@ -855,6 +859,7 @@ export const UpdateCategoryExpenditureInMonthDocument = gql`
     monthly(yearMonth: $yearMonth) {
       id
       amount
+      paid
     }
     date
     numberOfInstallments

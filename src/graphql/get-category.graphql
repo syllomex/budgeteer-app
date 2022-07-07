@@ -13,6 +13,7 @@ query GetCategory($id: String!, $yearMonth: String!) {
       monthly(yearMonth: $yearMonth) {
         id
         amount
+        paid
       }
     }
   }
