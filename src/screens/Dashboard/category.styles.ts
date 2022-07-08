@@ -3,7 +3,8 @@ import { rem } from '../../config/styles'
 
 const styles = StyleSheet.create({
   container: {
-    marginRight: rem(-1)
+    paddingLeft: rem(2),
+    paddingRight: rem(1)
   },
   row: {
     flexDirection: 'row',

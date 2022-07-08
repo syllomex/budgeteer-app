@@ -14,7 +14,7 @@ export const colors = {
   'background-matte+1': '#E7E8E9',
   'background-matte+2': '#E4E6EF',
   'border-line': '#BABABA',
-  muted: '#9A9A9A',
+  muted: '#AAAAAA',
   'muted-blue': '#AAAABB',
   placeholder: '#929292',
   'text-neutral': '#4E4E4E',

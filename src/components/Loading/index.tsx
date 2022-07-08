@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { ActivityIndicator, Modal, View } from 'react-native'
+import {
+  ActivityIndicator,
+  Modal,
+  StyleProp,
+  View,
+  ViewStyle
+} from 'react-native'
 import { colors, rem } from '../../config/styles'
 
 export const useLoadingText = ({
@@ -29,16 +35,18 @@ export const useLoadingText = ({
 
 export const LoadingIndicator = ({
   size = 'large',
-  spaced
+  spaced,
+  containerStyle
 }: {
   size?: 'large' | 'small'
   spaced?: boolean
+  containerStyle?: StyleProp<ViewStyle>
 }) => {
   return (
     <ActivityIndicator
       size={size}
       color={colors.primary}
-      style={[spaced && { marginVertical: rem(3) }]}
+      style={[spaced && { marginVertical: rem(3) }, containerStyle]}
     />
   )
 }

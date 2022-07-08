@@ -6,9 +6,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors['background-light']
   },
-  contentContainer: {
-    padding: rem(2)
-  },
+  contentContainer: {},
   categoriesContainer: {
     paddingVertical: rem(2.4)
   }
