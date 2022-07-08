@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { RefreshControl, ScrollView, View } from 'react-native'
+import { RefreshControl, View } from 'react-native'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 
 import { MonthSelector } from '../../components/MonthSelector'
@@ -9,13 +9,21 @@ import { LoadingIndicator } from '../../components/Loading'
 
 import { useStore } from '../../contexts/store'
 
+import { SwipeableScrollView } from '../../components/SwipeableScrollView'
 import { Category, NewCategoryButton } from './category'
 
 import styles from './styles'
 
 export const Dashboard = () => {
-  const { openCategoryModal, data, refetch, refreshing, monthlyIncomingForm } =
-    useStore()
+  const {
+    openCategoryModal,
+    data,
+    refetch,
+    refreshing,
+    monthlyIncomingForm,
+    goToNextMonth,
+    goToPrevMonth
+  } = useStore()
 
   const categories = useMemo(() => {
     if (!data) return null
@@ -38,11 +46,13 @@ export const Dashboard = () => {
         bottom={6}
       />
 
-      <ScrollView
+      <SwipeableScrollView
         contentContainerStyle={styles.contentContainer}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={refetch} />
         }
+        onSwipeLeft={goToPrevMonth}
+        onSwipeRight={goToNextMonth}
       >
         <MonthSelector />
 
@@ -65,7 +75,7 @@ export const Dashboard = () => {
             <NewCategoryButton center textColor="primary" />
           )}
         </View>
-      </ScrollView>
+      </SwipeableScrollView>
     </View>
   )
 }

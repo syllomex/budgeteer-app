@@ -153,16 +153,20 @@ export const useStore = () => {
   const { setMonth, month } = store
 
   const goToNextMonth = useCallback(() => {
-    const current = getDateByMonth(month)
-    const next = addMonths(current, 1)
-    setMonth(getCurrentMonth(next))
-  }, [month, setMonth])
+    setMonth(cur => {
+      const current = getDateByMonth(cur)
+      const next = addMonths(current, 1)
+      return getCurrentMonth(next)
+    })
+  }, [setMonth])
 
   const goToPrevMonth = useCallback(() => {
-    const current = getDateByMonth(month)
-    const prev = subMonths(current, 1)
-    setMonth(getCurrentMonth(prev))
-  }, [month, setMonth])
+    setMonth(cur => {
+      const current = getDateByMonth(cur)
+      const prev = subMonths(current, 1)
+      return getCurrentMonth(prev)
+    })
+  }, [setMonth])
 
   return { ...store, goToNextMonth, goToPrevMonth, yearMonth: month }
 }
