@@ -179,6 +179,7 @@ const MonthlyIncomingFormComponent: React.ForwardRefRenderFunction<
               label="Descrição"
               placeholder="Ex: Salário"
               defaultValue={data?.monthlyIncoming.description}
+              autoFocus
             />
 
             <ControlledInput
