@@ -54,6 +54,8 @@ const Store = createContext(
     refetch(): Promise<GetMonthlySummaryQuery>
     refreshing: boolean
     fetching: boolean
+    hideValues: boolean
+    setHideValues: SetState<boolean>
   }
 )
 
@@ -63,6 +65,7 @@ export const StoreProvider: FunctionComponent = ({ children }) => {
   const monthlyExpenditureFormRef = useRef<ExpenditureFormHandles>(null)
   const monthlyIncomingForm = useRef<MonthlyIncomingFormHandles>(null)
 
+  const [hideValues, setHideValues] = useState(true)
   const [month, setMonth] = useState(getCurrentMonth())
   const [editingCategoryId, setEditingCategoryId] = useState<string>()
 
@@ -120,7 +123,9 @@ export const StoreProvider: FunctionComponent = ({ children }) => {
           return (await refetch()).data
         },
         refreshing: networkStatus === NetworkStatus.refetch,
-        fetching: !!data && networkStatus === NetworkStatus.setVariables
+        fetching: !!data && networkStatus === NetworkStatus.setVariables,
+        hideValues,
+        setHideValues
       }}
     >
       {children}

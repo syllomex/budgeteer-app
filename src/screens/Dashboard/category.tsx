@@ -19,6 +19,7 @@ import {
 } from '../../components/SlideMenu'
 import { LoadingOverlay } from '../../components/Loading'
 import { confirm } from '../../components/Confirm'
+import { Hideable } from '../../components/Hideable'
 import styles from './category.styles'
 
 interface CategoryProps {
@@ -95,7 +96,9 @@ export const Category: React.FunctionComponent<CategoryProps> = ({ data }) => {
       <View style={styles.row}>
         <View style={styles.innerRow}>
           <T style={{ flex: 1 }}>{data.name}</T>
-          <T>{monetize(data.totalExpenses ?? 0)}</T>
+          <View>
+            <Hideable>{monetize(data.totalExpenses ?? 0)}</Hideable>
+          </View>
         </View>
         <TouchableOpacity
           style={styles.iconContainer}

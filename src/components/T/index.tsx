@@ -7,7 +7,7 @@ type FontFamily = 'regular' | 'medium' | 'semiBold' | 'bold' | 'italic'
 type Color = keyof typeof colors
 type Size = number
 
-interface TProps extends TextProps {
+export interface TProps extends TextProps {
   f?: FontFamily
   font?: FontFamily
   c?: Color

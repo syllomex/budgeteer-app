@@ -7,7 +7,8 @@ import {
   DrawerItemList
 } from '@react-navigation/drawer'
 
-import { View } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../contexts/auth'
 import { Color, colors, rem } from '../config/styles'
 import { DrawerHeader } from '../components/DrawerHeader'
@@ -15,6 +16,8 @@ import { T } from '../components/T'
 import { getCurrentYearMonth, monetize } from '../utils'
 import { useLoadingText } from '../components/Loading'
 import { useGetAvailableBudgetQuery } from '../graphql/generated/graphql'
+import { Hideable } from '../components/Hideable'
+import { useStore } from '../contexts/store'
 import { DashboardStack } from './DashboardStack'
 import { IncomingStack } from './IncomingStack'
 
@@ -46,6 +49,8 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
 }
 
 const HeaderRight = () => {
+  const { hideValues, setHideValues } = useStore()
+
   const { data } = useGetAvailableBudgetQuery({
     variables: { yearMonth: getCurrentYearMonth() }
   })
@@ -60,12 +65,26 @@ const HeaderRight = () => {
 
   return (
     <View style={{ paddingRight: rem(1.6) }}>
-      <T size={1} style={{ textAlign: 'right' }} color="muted">
-        Esse mês
-      </T>
-      <T color={color} size={1.8}>
-        {data ? monetize(data?.availableBudget) : loadingText}
-      </T>
+      <View>
+        <T size={1} style={{ textAlign: 'right' }} color="muted">
+          Esse mês
+        </T>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity
+            style={{ marginRight: rem(0.8) }}
+            onPress={() => setHideValues(cur => !cur)}
+          >
+            <Ionicons
+              name={hideValues ? 'eye-off-outline' : 'eye-outline'}
+              color={colors['border-line']}
+              size={rem(2)}
+            />
+          </TouchableOpacity>
+          <Hideable color={color} size={1.8}>
+            {data ? monetize(data?.availableBudget) : loadingText}
+          </Hideable>
+        </View>
+      </View>
     </View>
   )
 }

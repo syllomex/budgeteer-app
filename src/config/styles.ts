@@ -13,6 +13,7 @@ export const colors = {
   'background-matte': '#F4F6FF',
   'background-matte+1': '#E7E8E9',
   'background-matte+2': '#E4E6EF',
+  'background-matte+3': '#EEEEFF',
   'border-line': '#BABABA',
   muted: '#AAAAAA',
   'muted-blue': '#AAAABB',

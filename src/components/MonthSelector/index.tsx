@@ -6,6 +6,7 @@ import { colors, rem } from '../../config/styles'
 import { useDashboard } from '../../hooks'
 import { displayYearMonth, monetize } from '../../utils'
 import { YearMonthPicker, YearMonthPickerHandles } from '../Form/YearMonth'
+import { Hideable } from '../Hideable'
 import { LoadingIndicator, useLoadingText } from '../Loading'
 import { Spacer } from '../Spacer'
 import { T } from '../T'
@@ -73,19 +74,21 @@ export const MonthSelector: React.FunctionComponent<{
         <View style={styles.monthInfoContainer}>
           <View style={styles.monthInfoColumn}>
             <T color="muted">Rendimentos</T>
-            <T>
+            <Hideable>
               {fetching ? refreshingText : monetize(data.totalMonthlyIncomings)}
-            </T>
+            </Hideable>
           </View>
           <View style={styles.monthInfoColumn}>
             <T color="muted">Gastos</T>
-            <T>
+            <Hideable>
               {fetching ? refreshingText : monetize(data.totalMonthlyExpenses)}
-            </T>
+            </Hideable>
           </View>
           <View style={styles.monthInfoColumn}>
             <T color="muted">Disponível</T>
-            <T>{fetching ? refreshingText : monetize(data.availableBudget)}</T>
+            <Hideable>
+              {fetching ? refreshingText : monetize(data.availableBudget)}
+            </Hideable>
           </View>
         </View>
       )}
